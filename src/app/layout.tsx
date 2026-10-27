@@ -4,6 +4,7 @@ import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Providers } from "@/components/providers";
+import { siteOrigin } from "@/lib/site-url";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -25,16 +26,16 @@ const notoKufi = Noto_Kufi_Arabic({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://atlas-coach.ma"),
+  metadataBase: new URL(siteOrigin()),
   title: {
-    default: "Atlas Coach — Online Personal Trainer in Tetouan, Morocco",
-    template: "%s | Atlas Coach",
+    default: "Coach Oussama — Personal Training & Online Coaching",
+    template: "%s | Coach Oussama",
   },
   description:
-    "Professional online personal training from Tetouan, available across Morocco. Personalized workout programs, nutrition guidance, and real coaching support. Transform your body, transform your life.",
+    "Personal training with Coach Oussama. Explore coaching packages, follow your program and track your progress in a private dashboard.",
   keywords: [
-    "Coach sportif Tetouan",
-    "Personal trainer Tetouan",
+    "Coach Oussama",
+    "Coach sportif Maroc",
     "Coaching sportif en ligne Maroc",
     "Programme musculation Maroc",
     "Online fitness coach Morocco",
@@ -42,29 +43,28 @@ export const metadata: Metadata = {
     "Nutrition coach Maroc",
     "Body transformation Morocco",
   ],
-  authors: [{ name: "Atlas Coach" }],
-  creator: "Atlas Coach",
+  authors: [{ name: "Coach Oussama" }],
+  creator: "Coach Oussama",
   icons: { icon: "/logo.svg" },
   openGraph: {
-    title: "Atlas Coach — Online Personal Trainer in Tetouan, Morocco",
+    title: "Coach Oussama — Personal Training & Online Coaching",
     description:
-      "Professional online personal training from Tetouan, available across Morocco. Personalized workouts, nutrition guidance, and real coaching support.",
-    url: "https://atlas-coach.ma",
-    siteName: "Atlas Coach",
+      "A training plan that fits your goals, practical nutrition guidance and direct coach support.",
+    url: siteOrigin(),
+    siteName: "Coach Oussama",
     type: "website",
     locale: "en_US",
-    images: [{ url: "/images/hero.jpg", width: 1440, height: 720, alt: "Atlas Coach" }],
+    images: [{ url: "/images/hero.jpg", alt: "Coach Oussama — personal training" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Atlas Coach — Online Personal Trainer in Morocco",
+    title: "Coach Oussama — Online Personal Trainer in Morocco",
     description:
-      "Professional online personal training from Tetouan, available across Morocco.",
+      "Personal training and online coaching with Coach Oussama.",
     images: ["/images/hero.jpg"],
   },
   alternates: {
     canonical: "/",
-    languages: { en: "/", fr: "/", ar: "/" },
   },
   robots: { index: true, follow: true },
 };

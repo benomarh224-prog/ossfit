@@ -95,7 +95,7 @@ export function MeetCoach({ content }: { content: any }) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={content.coachPortrait}
-                  alt={content.coachName}
+                  alt="Personal training and strength coaching"
                   className="aspect-[3/4] w-full object-cover"
                 />
               ) : (
@@ -103,7 +103,7 @@ export function MeetCoach({ content }: { content: any }) {
               )}
             </div>
             <Badge className="absolute -bottom-3 left-1/2 -translate-x-1/2 border border-primary/30 bg-card px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary shadow-lg">
-              {t("coach.city")}
+              {content.coachCity || t("coach.city")}
             </Badge>
           </motion.div>
 
@@ -187,15 +187,36 @@ export function MeetCoach({ content }: { content: any }) {
 
 /* ---------- 2. Why choose ---------- */
 export function WhyChoose() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const reasons = [
     { icon: Target, title: "Personalized Programming", desc: "Programs built around your body, equipment, schedule and specific goals — never generic templates." },
-    { icon: TrendingUp, title: "Real Progress Monitoring", desc: "Weekly check-ins, performance logs and adjustments so progress never stalls." },
+    { icon: TrendingUp, title: "A clear view of your progress", desc: "Check-ins, workout logs and program reviews keep your next step clear." },
     { icon: Salad, title: "Nutrition That Fits Life", desc: "Calorie and macro targets plus meal guidance adapted to Moroccan lifestyle and food culture." },
     { icon: Users, title: "Direct Coach Access", desc: "Message your coach directly through WhatsApp and your private dashboard — no call centers." },
     { icon: ShieldCheck, title: "Evidence-Based Methods", desc: "No gimmicks or dangerous protocols. Sustainable, science-backed coaching you can trust." },
     { icon: Clock, title: "Truly Online, All Morocco", desc: "From Tangier to Agadir — train wherever you are with full coaching support." },
-  ];
+  ].map((reason, index) => {
+    const translated = {
+      fr: [
+        ["Un programme qui vous ressemble", "Votre niveau, vos objectifs et votre matériel définissent votre entraînement."],
+        ["Des progrès visibles", "Bilans, carnet de séances et révisions pour avancer avec clarté."],
+        ["Une nutrition pratique", "Des repères et habitudes alimentaires adaptés à votre quotidien."],
+        ["Un échange direct", "Messagerie privée et WhatsApp pour rester en contact avec votre coach."],
+        ["Une démarche réaliste", "Des objectifs clairs, une progression régulière et des ajustements réfléchis."],
+        ["L'entraînement où vous êtes", "À la maison ou en salle, votre programme vous accompagne."],
+      ],
+      ar: [
+        ["برنامج مبني عليك", "أهدافك ومستواك ومعداتك هي أساس خطتك التدريبية."],
+        ["تقدم واضح", "تقييمات وسجل للحصص ومراجعات للبرنامج توضح خطوتك القادمة."],
+        ["تغذية عملية", "عادات وإرشادات غذائية تناسب حياتك اليومية."],
+        ["تواصل مباشر", "رسائل خاصة وواتساب للبقاء على تواصل مع مدربك."],
+        ["منهج واقعي", "أهداف واضحة وتدرج منتظم وتعديلات مدروسة."],
+        ["تدرب أينما كنت", "في المنزل أو القاعة، برنامجك يرافقك."],
+      ],
+    };
+    const text = locale === "en" ? null : translated[locale][index];
+    return text ? { ...reason, title: text[0], desc: text[1] } : reason;
+  });
   return (
     <section className="relative border-y border-border/40 bg-card/30 py-20 sm:py-28">
       <div className="bg-grid absolute inset-0 opacity-40" />
@@ -287,13 +308,20 @@ export function Services({ services }: { services: any[] }) {
 
 /* ---------- 4. How it works ---------- */
 export function HowItWorks() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const steps = [
     { n: "01", title: "Create your account", desc: "Register in seconds and complete your fitness assessment." },
     { n: "02", title: "Get your program", desc: "Your coach builds a personalized workout and nutrition plan after reviewing your assessment." },
     { n: "03", title: "Train & track", desc: "Follow your plan in the app, log workouts, meals and progress photos." },
     { n: "04", title: "Adjust & progress", desc: "Weekly check-ins keep your program adapting so you never plateau." },
-  ];
+  ].map((step, index) => {
+    const translated = {
+      fr: [["Créez votre compte", "Inscrivez-vous et complétez votre bilan de départ."], ["Recevez votre programme", "Le coach étudie vos objectifs puis prépare votre entraînement et vos repères nutritionnels."], ["Entraînez-vous et suivez", "Retrouvez vos séances et notez vos habitudes et vos progrès dans votre espace."], ["Ajustez et avancez", "Les bilans permettent d'adapter le programme à votre évolution."]],
+      ar: [["أنشئ حسابك", "سجّل وأكمل تقييمك الأولي."], ["احصل على برنامجك", "يراجع المدرب أهدافك ويعد برنامج التدريب والتوجيه الغذائي."], ["تدرب وتتبع", "تابع حصصك وسجّل عاداتك وتقدمك في حسابك الخاص."], ["راجع وتقدم", "تساعد التقييمات على تكييف البرنامج مع تطورك."]],
+    };
+    const text = locale === "en" ? null : translated[locale][index];
+    return text ? { ...step, title: text[0], desc: text[1] } : step;
+  });
   return (
     <section id="how" className="border-y border-border/40 bg-card/30 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -325,7 +353,7 @@ export function HowItWorks() {
 
 /* ---------- 5. Transformations gallery ---------- */
 export function Transformations({ transformations }: { transformations: any[] }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   if (!transformations?.length) return null;
   return (
     <section id="results" className="py-20 sm:py-28">
@@ -377,7 +405,7 @@ export function Transformations({ transformations }: { transformations: any[] })
           ))}
         </div>
         <p className="mx-auto mt-8 max-w-2xl text-center text-xs text-muted-foreground">
-          Transformations are published only with explicit client consent. Placeholders shown here are clearly marked as demo.
+          {locale === "ar" ? "تُنشر صور التحول بعد موافقة أصحابها فقط. النتائج تختلف حسب كل شخص." : locale === "fr" ? "Photos publiées avec le consentement des clients. Les résultats varient selon la personne." : "Shared with client consent. Individual results vary."}
         </p>
       </div>
     </section>
@@ -387,10 +415,10 @@ export function Transformations({ transformations }: { transformations: any[] })
 /* ---------- 6. Packages ---------- */
 export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsappNumber?: string }) {
   const { t, locale } = useI18n();
-  const [authTrigger] = useState(() => () => {
-    const event = new CustomEvent("atlas:open-auth", { detail: "register" });
+  const authTrigger = (packageId: string) => {
+    const event = new CustomEvent("atlas:open-auth", { detail: { tab: "register", packageId } });
     window.dispatchEvent(event);
-  });
+  };
 
   return (
     <section id="packages" className="scroll-mt-20 border-y border-border/40 bg-card/30 py-20 sm:py-28">
@@ -451,7 +479,7 @@ export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsa
                     </ul>
                     <div className="mt-auto flex flex-col gap-2 pt-6">
                       <Button
-                        onClick={authTrigger}
+                        onClick={() => authTrigger(p.id)}
                         className={featured ? "w-full bg-primary text-primary-foreground hover:bg-primary/90" : "w-full"}
                         variant={featured ? "default" : "outline"}
                       >

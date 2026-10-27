@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 
-// Helpers for JSON-encoded string fields (SQLite does not support arrays)
+// Helpers for JSON-encoded string fields.
 export function parseJSON<T>(value: string | null | undefined, fallback: T): T {
   if (!value) return fallback;
   try {
@@ -14,24 +14,11 @@ export function toJSON(value: unknown): string {
   return JSON.stringify(value);
 }
 
-// Moroccan phone validation: accept 06XXXXXXXX / 07XXXXXXXX / +2126... / +2127...
-export function isValidMoroccanPhone(input: string): boolean {
-  const s = input.replace(/[\s-]/g, "");
-  return /^(?:\+212|0)([5-7]\d{8})$/.test(s);
-}
-
-// Normalize to international +212XXXXXXXXX form
-export function normalizeMoroccanPhone(input: string): string {
-  const s = input.replace(/[\s-]/g, "");
-  if (s.startsWith("+212")) return s;
-  if (s.startsWith("212")) return "+" + s;
-  if (s.startsWith("0")) return "+212" + s.slice(1);
-  return s;
-}
+export { isValidMoroccanPhone, normalizeMoroccanPhone } from "@/lib/phone";
 
 // Build a wa.me link with a pre-filled message
 export function whatsappLink(number: string | undefined | null, message: string): string {
-  const n = number || process.env.WHATSAPP_DEFAULT_NUMBER || "+212600000000";
+  const n = number || process.env.WHATSAPP_DEFAULT_NUMBER || "+212610296995";
   const clean = n.replace(/[^\d]/g, "");
   return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
 }
@@ -57,7 +44,7 @@ export async function requireClient() {
 
 export async function requireAuth() {
   const session = await getSession();
-  if (!session) return null;
+  if (!session?.user?.id) return null;
   return session;
 }
 

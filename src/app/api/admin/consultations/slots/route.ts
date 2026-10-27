@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import type { ConsultationSlot } from "@prisma/client";
 import { db } from "@/lib/db";
 import { requireCoach } from "@/lib/server-utils";
 
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
   let body: { starts?: string[] } = {};
   try { body = await req.json(); } catch { /* empty */ }
   if (!body.starts?.length) return NextResponse.json({ error: "starts required" }, { status: 400 });
-  const created = [];
+  const created: ConsultationSlot[] = [];
   for (const s of body.starts) {
     const start = new Date(s);
     if (isNaN(start.getTime())) continue;

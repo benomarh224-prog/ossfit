@@ -73,7 +73,7 @@ function BrandBlock() {
         <Dumbbell className="size-5" />
       </div>
       <div className="leading-tight">
-        <p className="font-display text-base tracking-wider text-foreground">ATLAS COACH</p>
+        <p className="font-display text-base tracking-wider text-foreground">COACH OUSSAMA</p>
         <Badge
           variant="outline"
           className="border-primary/40 bg-primary/10 px-1.5 py-0 text-[10px] font-semibold text-primary"
@@ -142,7 +142,7 @@ function SidebarFooter() {
         size="sm"
         className="justify-start gap-2"
       >
-        <a href="/" rel="noopener noreferrer">
+        <a href="/?view=site" target="_blank" rel="noopener noreferrer">
           <ExternalLink className="size-4" />
           {t("admin.analytics") ? "View site" : "View site"}
         </a>
@@ -233,7 +233,7 @@ export function AdminApp() {
             </div>
             <div className="hidden items-center gap-2 sm:flex">
               <Button asChild variant="outline" size="sm">
-                <a href="/">
+                <a href="/?view=site" target="_blank" rel="noopener noreferrer">
                   <ExternalLink className="size-4" />
                   View site
                 </a>

@@ -4,12 +4,15 @@ import bcrypt from "bcryptjs";
 import { toJSON } from "../src/lib/server-utils";
 
 async function main() {
+  if (process.env.NODE_ENV === "production" || process.env.VERCEL_ENV === "production") {
+    throw new Error("Demo seeding is disabled in production. Use the private owner setup link and coach dashboard.");
+  }
   // ---- Coach account (single trainer) ----
-  const coachEmail = process.env.COACH_SEED_EMAIL || "coach@atlas-coach.ma";
+  const coachEmail = process.env.COACH_SEED_EMAIL;
   const coachPass = process.env.COACH_SEED_PASSWORD;
   const demoClientPass = process.env.DEMO_CLIENT_SEED_PASSWORD;
-  if (!coachPass || !demoClientPass) {
-    throw new Error("Set COACH_SEED_PASSWORD and DEMO_CLIENT_SEED_PASSWORD before seeding.");
+  if (!coachEmail || !coachPass || !demoClientPass) {
+    throw new Error("Set COACH_SEED_EMAIL, COACH_SEED_PASSWORD and DEMO_CLIENT_SEED_PASSWORD for a development-only demo.");
   }
   const hashed = await bcrypt.hash(coachPass, 10);
 

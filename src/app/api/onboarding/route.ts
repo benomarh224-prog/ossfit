@@ -11,16 +11,17 @@ const schema = z.object({
   city: z.string().min(2),
   goal: z.enum(["muscle", "fat_loss", "recomp", "strength", "health"]),
   experience: z.enum(["beginner", "intermediate", "advanced"]),
-  equipment: z.array(z.string()),
+  equipment: z.array(z.string().max(100)).min(1).max(20),
   weeklyAvailability: z.enum(["avail2", "avail4", "avail6"]),
-  preferredPackageId: z.string().optional(),
-  limitations: z.string().optional(),
-  injuryConsent: z.boolean(),
+  preferredPackageId: z.string().min(1).optional(),
+  limitations: z.string().max(2000).optional(),
+  injuryConsent: z.literal(true),
 });
 
 export async function POST(req: NextRequest) {
   const session = await requireAuth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (session.user.role !== "CLIENT") return NextResponse.json({ error: "Client account required" }, { status: 403 });
 
   let body: unknown;
   try {
@@ -33,8 +34,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
   }
   const d = parsed.data;
+  const pkg = d.preferredPackageId ? await db.package.findFirst({ where: { id: d.preferredPackageId, available: true } }) : null;
+  if (d.preferredPackageId && !pkg) return NextResponse.json({ error: "Choose an available package" }, { status: 400 });
 
-  await db.clientProfile.upsert({
+  await db.$transaction(async (tx) => {
+  const existing = await tx.clientProfile.findUnique({ where: { userId: session.user.id } });
+  if (existing?.onboarded) return;
+  await tx.clientProfile.upsert({
     where: { userId: session.user.id },
     create: {
       userId: session.user.id,
@@ -72,10 +78,8 @@ export async function POST(req: NextRequest) {
   });
 
   // Create a subscription request tied to the chosen package
-  if (d.preferredPackageId) {
-    const pkg = await db.package.findUnique({ where: { id: d.preferredPackageId } });
-    if (pkg) {
-      await db.subscription.create({
+  if (pkg) {
+      await tx.subscription.create({
         data: {
           userId: session.user.id,
           packageId: pkg.id,
@@ -83,8 +87,8 @@ export async function POST(req: NextRequest) {
           status: "PENDING",
         },
       });
-    }
   }
+  });
 
   return NextResponse.json({ ok: true });
 }

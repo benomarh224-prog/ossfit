@@ -756,7 +756,7 @@ function PaymentDialog({ open, onOpenChange, packages, sub, onSubmit, loading }:
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>{t("actions.cancel")}</Button>
           <Button className="bg-primary text-primary-foreground hover:bg-primary/90" disabled={loading || uploading || !pkg || !proofUrl}
-            onClick={() => onSubmit({ subscriptionId: sub?.id, packageTitle: pkg?.title, amountMAD: pkg?.priceMAD, proofUrl })}>
+            onClick={() => onSubmit({ packageId: pkg?.id, subscriptionId: sub?.package?.id === pkgId ? sub?.id : undefined, proofUrl })}>
             {t("actions.submit")}
           </Button>
         </DialogFooter>

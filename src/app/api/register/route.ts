@@ -3,15 +3,19 @@ import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { isValidMoroccanPhone, normalizeMoroccanPhone } from "@/lib/server-utils";
+import { allowRequest, requestIp } from "@/lib/rate-limit";
 
 const schema = z.object({
   name: z.string().min(2, "Name too short").max(80),
-  email: z.string().email("Invalid email"),
-  password: z.string().min(8, "Password must be at least 8 characters"),
+  email: z.string().trim().email("Invalid email").max(254),
+  password: z.string().min(8, "Password must be at least 8 characters").refine((value) => Buffer.byteLength(value, "utf8") <= 72, "Password is too long"),
   phone: z.string().refine(isValidMoroccanPhone, "Invalid Moroccan phone"),
 });
 
 export async function POST(req: NextRequest) {
+  if (!await allowRequest("registration", requestIp(req.headers), 5, 60 * 60 * 1000)) {
+    return NextResponse.json({ error: "Too many registration attempts. Please try again later." }, { status: 429 });
+  }
   let body: unknown;
   try {
     body = await req.json();

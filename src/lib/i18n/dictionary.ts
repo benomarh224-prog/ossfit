@@ -28,7 +28,7 @@ export const dictionary = {
     hero: {
       title: "TRANSFORM YOUR BODY. TRANSFORM YOUR LIFE.",
       subtitle:
-        "Professional online personal training from Tetouan, available across Morocco. Personalized workouts, nutrition guidance, and real coaching support.",
+        "Professional online personal training with Coach Oussama, available across Morocco. Personalized workouts, nutrition guidance, and real coaching support.",
       primaryCta: "Start Your Transformation",
       secondaryCta: "Explore Coaching Plans",
       whatsapp: "Chat on WhatsApp",
@@ -209,9 +209,9 @@ export const dictionary = {
       bankDetails: "Bank Transfer Details",
     },
     coach: {
-      name: "Youssef El Amrani",
+      name: "Oussama",
       role: "Certified Online Personal Trainer",
-      city: "Tetouan, Morocco",
+      city: "Morocco",
       storyTitle: "My Story",
       philosophyTitle: "My Philosophy",
       certificationsTitle: "Certifications & Experience",
@@ -221,14 +221,14 @@ export const dictionary = {
       contactWhatsapp: "Contact on WhatsApp",
     },
     footer: {
-      tagline: "Premium online personal training from Tetouan to all of Morocco.",
+      tagline: "Premium online personal training with Coach Oussama, wherever you train.",
       quickLinks: "Quick Links",
       services: "Services",
       legal: "Legal",
       privacy: "Privacy Policy",
-      terms: "Terms of Service",
+      terms: "Coaching & Payments",
       rights: "All rights reserved.",
-      madeIn: "Made in Tetouan, Morocco",
+      madeIn: "Built around your goals",
     },
     common: {
       loading: "Loading...",
@@ -265,7 +265,7 @@ export const dictionary = {
     hero: {
       title: "TRANSFORMEZ VOTRE CORPS. TRANSFORMEZ VOTRE VIE.",
       subtitle:
-        "Coaching sportif personnel en ligne depuis Tétouan, disponible partout au Maroc. Programmes personnalisés, conseils en nutrition et accompagnement réel.",
+        "Coaching sportif personnel en ligne avec Coach Oussama, partout au Maroc. Programmes personnalisés, conseils en nutrition et accompagnement réel.",
       primaryCta: "Commencer ma transformation",
       secondaryCta: "Découvrir les formules",
       whatsapp: "Discuter sur WhatsApp",
@@ -446,9 +446,9 @@ export const dictionary = {
       bankDetails: "Coordonnées bancaires",
     },
     coach: {
-      name: "Youssef El Amrani",
+      name: "Oussama",
       role: "Coach sportif personnel en ligne certifié",
-      city: "Tétouan, Maroc",
+      city: "Maroc",
       storyTitle: "Mon histoire",
       philosophyTitle: "Ma philosophie",
       certificationsTitle: "Certifications & Expérience",
@@ -458,14 +458,14 @@ export const dictionary = {
       contactWhatsapp: "Contacter sur WhatsApp",
     },
     footer: {
-      tagline: "Coaching sportif personnel premium depuis Tétouan vers tout le Maroc.",
+      tagline: "Coaching sportif personnel premium avec Coach Oussama, partout au Maroc.",
       quickLinks: "Liens rapides",
       services: "Services",
       legal: "Légal",
       privacy: "Politique de confidentialité",
-      terms: "Conditions d'utilisation",
+      terms: "Coaching et paiements",
       rights: "Tous droits réservés.",
-      madeIn: "Conçu à Tétouan, Maroc",
+      madeIn: "Un accompagnement à votre rythme",
     },
     common: {
       loading: "Chargement...",
@@ -502,7 +502,7 @@ export const dictionary = {
     hero: {
       title: "غيّر جسدك. غيّر حياتك.",
       subtitle:
-        "تدريب شخصي احترافي عبر الإنترنت من تطوان، متاح في كل أنحاء المغرب. برامج تدريب مخصصة، إرشادات غذائية، ودعم تدريبي حقيقي.",
+        "تدريب شخصي احترافي عبر الإنترنت مع أسامة، متاح في كل أنحاء المغرب. برامج تدريب مخصصة، إرشادات غذائية، ودعم تدريبي حقيقي.",
       primaryCta: "ابدأ تحولك",
       secondaryCta: "استكشف باقات التدريب",
       whatsapp: "تواصل عبر واتساب",
@@ -683,9 +683,9 @@ export const dictionary = {
       bankDetails: "تفاصيل التحويل البنكي",
     },
     coach: {
-      name: "يوسف العمراني",
+      name: "أسامة",
       role: "مدرب شخصي معتمد عبر الإنترنت",
-      city: "تطوان، المغرب",
+      city: "المغرب",
       storyTitle: "قصتي",
       philosophyTitle: "فلسفتي",
       certificationsTitle: "الشهادات والخبرة",
@@ -695,14 +695,14 @@ export const dictionary = {
       contactWhatsapp: "تواصل عبر واتساب",
     },
     footer: {
-      tagline: "تدريب شخصي احترافي متميز من تطوان إلى كل المغرب.",
+      tagline: "تدريب شخصي احترافي متميز مع أسامة أينما كنت.",
       quickLinks: "روابط سريعة",
       services: "الخدمات",
       legal: "قانوني",
       privacy: "سياسة الخصوصية",
-      terms: "شروط الخدمة",
+      terms: "التدريب والدفع",
       rights: "جميع الحقوق محفوظة.",
-      madeIn: "صُنع في تطوان، المغرب",
+      madeIn: "تدريب مبني على أهدافك",
     },
     common: {
       loading: "جار التحميل...",

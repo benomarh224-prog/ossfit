@@ -21,13 +21,14 @@ const NAV = [
   { href: "#faq", key: "nav.faq" },
 ];
 
-export function SiteHeader({ brandName }: { brandName: string }) {
+export function SiteHeader({ brandName, showResults = false, showTestimonials = false }: { brandName: string; showResults?: boolean; showTestimonials?: boolean }) {
   const { t, locale } = useI18n();
   const isRTL = locale === "ar";
   const [scrolled, setScrolled] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<"login" | "register">("login");
   const [active, setActive] = useState<string>("");
+  const navigation = NAV.filter((item) => (item.href !== "#results" || showResults) && (item.href !== "#testimonials" || showTestimonials));
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 24);
@@ -38,7 +39,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
 
   // Scroll-spy: highlight the section currently in view
   useEffect(() => {
-    const sections = NAV.map((n) => document.querySelector(n.href)).filter(Boolean) as Element[];
+    const sections = NAV.filter((n) => (n.href !== "#results" || showResults) && (n.href !== "#testimonials" || showTestimonials)).map((n) => document.querySelector(n.href)).filter(Boolean) as Element[];
     if (!sections.length) return;
     const observer = new IntersectionObserver(
       (entries) => {
@@ -51,7 +52,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
     );
     sections.forEach((s) => observer.observe(s));
     return () => observer.disconnect();
-  }, []);
+  }, [showResults, showTestimonials]);
 
   const openAuth = (tab: "login" | "register") => {
     setAuthTab(tab);
@@ -71,12 +72,12 @@ export function SiteHeader({ brandName }: { brandName: string }) {
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-        <Link href="#top" className="flex shrink-0 items-center gap-2" aria-label={brandName || "Atlas Coach"}>
+        <Link href="#top" className="flex shrink-0 items-center gap-2" aria-label={brandName || "Coach Oussama"}>
           <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Dumbbell className="h-5 w-5" />
           </span>
           <span className="font-display text-base font-bold uppercase tracking-tight sm:text-lg">
-            {brandName || "Atlas Coach"}
+            {brandName || "Coach Oussama"}
           </span>
         </Link>
 
@@ -84,7 +85,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
           aria-label="Primary"
           className="hidden items-center gap-0.5 lg:flex"
         >
-          {NAV.map((n) => {
+          {navigation.map((n) => {
             const isActive = active === n.href;
             return (
               <Link
@@ -133,7 +134,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
               <SheetContent side={sheetSide} className="w-[300px] bg-card p-0">
                 <div className="flex items-center justify-between border-b border-border/50 p-4">
                   <span className="font-display text-lg font-bold uppercase">
-                    {brandName || "Atlas Coach"}
+                    {brandName || "Coach Oussama"}
                   </span>
                   <SheetClose asChild>
                     <Button variant="ghost" size="icon" aria-label="Close">
@@ -142,7 +143,7 @@ export function SiteHeader({ brandName }: { brandName: string }) {
                   </SheetClose>
                 </div>
                 <nav aria-label="Mobile" className="flex flex-col gap-0.5 p-3">
-                  {NAV.map((n) => (
+                  {navigation.map((n) => (
                     <SheetClose asChild key={n.href}>
                       <Link
                         href={n.href}

@@ -1,132 +1,44 @@
-# Atlas Coach — Online Personal Trainer Platform
+# Coach Oussama
 
-Premium online personal training platform for a coach in **Tetouan, Morocco**,
-serving clients across all of Morocco. Built with Next.js 16 (App Router),
-TypeScript, Tailwind CSS 4, shadcn/ui, Framer Motion, Prisma (PostgreSQL),
-NextAuth, Recharts, and a trilingual i18n system (English / French / Arabic
-with full RTL support).
+A custom coaching website and private client workspace built with Next.js 16, React 19, Prisma 6 and PostgreSQL.
 
-## Features
+## Run locally
 
-- **Marketing landing page** (`/`) — cinematic hero, Meet Your Coach, Why
-  Choose, Services, How It Works, Transformation Gallery, Packages (MAD
-  pricing), Testimonials, FAQ, final CTA, premium footer.
-- **Authentication & onboarding** — NextAuth credentials, role-based
-  (CLIENT/COACH), Moroccan phone validation, 4-step fitness assessment.
-- **Client dashboard** — overview, workouts, nutrition, progress photos &
-  weekly check-ins, coach messaging, subscription + bank-transfer payment
-  proof upload, consultation booking, profile + privacy/data-export notice.
-- **Coach admin dashboard** — clients approval, workout/nutrition plan
-  assignment with day-builders, full CRUD for packages/services/testimonials/
-  transformations/FAQ, site content editor, consultation slot management,
-  payment verification (auto-activates subscriptions), analytics with Recharts.
-- **WhatsApp integration** — floating button + prefilled inquiry messages;
-  number configurable from admin.
-- **Payments (Morocco)** — manual bank transfer in MAD, proof upload, coach
-  verification workflow, invoice numbers, payment history. No fake card
-  payments.
-- **i18n** — EN/FR/AR with live RTL flip. UI chrome fully translated; marketing
-  body copy is coach-editable (single-language).
-- **SEO** — metadata, OpenGraph/Twitter, dynamic sitemap, robots, JSON-LD
-  structured data.
+Use Node.js 24 and npm. Copy `.env.example` to `.env` and supply a **development** PostgreSQL database, a private Blob store credential and your own session secret. Never commit `.env`.
 
-## Tech stack
-
-- Next.js 16 (App Router) + TypeScript 5
-- Tailwind CSS 4 + shadcn/ui (New York) + Lucide icons
-- Framer Motion (animations), Recharts (charts)
-- Prisma ORM (PostgreSQL), NextAuth.js v4 (credentials, JWT, roles)
-- Zustand (client state), TanStack Query (server state), react-hook-form + zod
-- next-themes (dark-first premium theme)
-
-## Setup
-
-```bash
-# 1. Install dependencies
-bun install            # or: npm install / pnpm install
-
-# 2. Copy env and set secrets
-cp .env.example .env
-#   - set DATABASE_URL to your PostgreSQL connection string
-#   - set NEXTAUTH_SECRET to a long random string
-#   - set COACH_SEED_PASSWORD and DEMO_CLIENT_SEED_PASSWORD to unique values
-#   - optionally set COACH_SEED_EMAIL (your coach login)
-
-# 3. Apply the PostgreSQL migration
-bun run db:migrate
-
-# 4. Seed demo content (coach + demo client + services/packages/FAQ/etc.)
-bun run scripts/seed.ts
-
-# 5. Start the dev server
-bun run dev
-#   open http://localhost:3000
+```sh
+npm ci
+npm run db:generate
+npm run db:migrate
+npm run dev
 ```
 
-## Seeded accounts
+`npm run build` generates Prisma Client, applies committed migrations to the configured database and builds Next.js. On Vercel, pushes to `main` deploy production. Use a separate database for preview/development; the current Marketplace integration initially connected preview and production to the same database.
 
-- **Coach (admin):** `COACH_SEED_EMAIL` / `COACH_SEED_PASSWORD`
-- **Demo client:** `client@demo.ma` / `DEMO_CLIENT_SEED_PASSWORD`
+## Owner handoff
 
-Keep the passwords in your local `.env` file. The seed script requires both
-passwords and does not print them.
+1. Open the private owner setup link supplied separately. Choose the coach email and a password of at least 12 characters. The link closes permanently after the first coach account is created.
+2. Sign in from the website to open the coach dashboard. `View site` opens the public page in another tab.
+3. Review the coach name, professional contact details, images and copy in Site Content. The surname and exact city were not supplied. The current training imagery is illustrative, not a verified portrait of the coach.
+4. Confirm the package scope and prices: 399 / 699 / 1199 MAD per month. The coach can edit, hide or add packages.
+5. Enter the real bank beneficiary, IBAN/RIB and payment instructions before accepting transfers. The site does not charge cards or renew subscriptions automatically.
+6. Add only consented client testimonials and transformation images. No invented client results are seeded publicly.
+7. Review the privacy notice and agree service start dates, renewals, cancellations and refund conditions with clients. The information pages describe the application; they do not establish a jurisdiction-specific legal compliance review.
+8. Transfer or arrange ownership of the GitHub repository, Vercel project, domain, database and Blob store with the buyer. Hosting and storage usage remain billed to the account that owns them.
 
-> Demo transformations & testimonials are clearly marked as DEMO
-> (`consent: false`). Replace them with real, consented client content from the
-> admin dashboard before going live. Never publish a client's photos or story
-> without explicit consent.
+## Access and uploads
 
-## Architecture notes
+Client uploads are private to their owner and the coach. Coach uploads are intended for public marketing content. Images are decoded, stripped of metadata, resized and converted to WebP. The input limit is 3 MB and 30 uploads per account per rolling day. Uploaded images persist in a private Vercel Blob store, with access enforced through the application.
 
-- **Single visible route:** only `/` is user-visible. `src/app/page.tsx` is a
-  server component that uses `getServerSession` and renders:
-  - role `COACH` → `<AdminApp/>`
-  - role `CLIENT` → `<ClientApp/>` (with an onboarding gate if not onboarded)
-  - else → `<LandingPage/>` (SSR, good for SEO)
-  Login via NextAuth redirects to `/`, re-rendering the right view server-side.
-- **API:** everything else is an API route under `src/app/api/` with zod
-  validation and role guards (`requireCoach` / `requireClient` / `requireAuth`
-  in `src/lib/server-utils.ts`).
-- **List fields** in the Prisma schema are JSON-encoded strings; helpers
-  `parseJSON`/`toJSON` handle them.
-- **Uploads** are stored locally in `public/uploads/` via `POST /api/upload`
-  (image-only, validated, max 6 MB). Swap for Cloudinary/S3 in production.
-- **Payments** are manual bank-transfer with proof verification. The system is
-  architected to later integrate a verified Morocco-compatible gateway (CMI).
+Bank account fields are omitted from anonymous page data. Registration and sign-in are rate limited through PostgreSQL. Prices and payment ownership are checked on the server.
 
-## Project structure
+## Checks
 
-```
-prisma/schema.prisma         # full database schema
-scripts/seed.ts             # demo seed (coach, client, content)
-scripts/gen-images.ts       # regenerates marketing imagery via z-ai SDK
-src/app/page.tsx            # role-based server entry
-src/app/layout.tsx          # fonts + providers + SEO metadata
-src/app/api/...             # all API routes (auth, content, admin, ...)
-src/components/marketing/   # landing page sections
-src/components/site/        # header, footer, whatsapp, language switcher
-src/components/auth/        # auth modal + onboarding
-src/components/dashboard/   # client dashboard + sections
-src/components/admin/       # coach admin dashboard + sections
-src/lib/auth.ts             # NextAuth config (roles)
-src/lib/db.ts               # Prisma client
-src/lib/server-utils.ts     # guards, JSON helpers, whatsapp link, site content
-src/lib/i18n/               # trilingual dictionary + provider + formatMAD
+```sh
+npm test
+npm run typecheck
+npm audit
+npm run build
 ```
 
-## Deployment
-
-- Set production `NEXTAUTH_SECRET` and `NEXTAUTH_URL`; connect a PostgreSQL
-  database so Vercel provides `DATABASE_URL`.
-- For a real Morocco payment gateway, integrate CMI (or another eligible
-  provider) and replace the manual-transfer flow once tested.
-- The build runs `prisma migrate deploy`; seed or import real content separately.
-- The pricing migration adds the original 399 / 699 / 1199 MAD monthly tiers
-  only when the packages table is empty. Existing packages are preserved.
-- The site is dark-first; ensure the reverse proxy passes the `Accept-Language`
-  and WebSocket headers (not required for the marketing site).
-
-## License / attribution
-
-Imagery is AI-generated (z-ai image-generation skill) for demo purposes —
-replace with the coach's real, licensed photographs before launch.
+The private owner setup link must never be committed, included in a sales listing or forwarded to anyone except the intended owner. Password recovery by email is not implemented; keep the coach credentials in a password manager and arrange a verified support procedure before broad public launch.

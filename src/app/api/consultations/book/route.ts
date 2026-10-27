@@ -11,6 +11,7 @@ const schema = z.object({
 export async function POST(req: NextRequest) {
   const session = await requireAuth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (session.user.role !== "CLIENT") return NextResponse.json({ error: "Client account required" }, { status: 403 });
 
   let body: unknown;
   try {
@@ -33,15 +34,16 @@ export async function POST(req: NextRequest) {
     slot.bookings.some((b) => b.status === "REQUESTED" || b.status === "APPROVED");
   if (alreadyBooked) return NextResponse.json({ error: "This slot is already booked" }, { status: 409 });
 
-  const booking = await db.consultationBooking.create({
-    data: {
-      userId: session.user.id,
-      slotId: slot.id,
-      goals: parsed.data.goals,
-      status: "REQUESTED",
-    },
+  const booking = await db.$transaction(async (tx) => {
+    const reserved = await tx.consultationSlot.updateMany({
+      where: { id: slot.id, booked: false, start: { gt: new Date() } }, data: { booked: true },
+    });
+    if (reserved.count !== 1) return null;
+    return tx.consultationBooking.create({ data: {
+      userId: session.user.id, slotId: slot.id, goals: parsed.data.goals, status: "REQUESTED",
+    } });
   });
-  await db.consultationSlot.update({ where: { id: slot.id }, data: { booked: true } });
+  if (!booking) return NextResponse.json({ error: "This slot is no longer available. Choose another time." }, { status: 409 });
 
   // notify coach
   const coach = await db.user.findFirst({ where: { role: "COACH" } });

@@ -268,6 +268,7 @@ export async function apiFetch<T>(url: string, init?: RequestInit): Promise<T> {
 }
 
 export async function uploadImage(file: File): Promise<string> {
+  if (file.size > 3 * 1024 * 1024) throw new Error("Choose an image smaller than 3 MB");
   const fd = new FormData();
   fd.append("file", file);
   const res = await fetch("/api/upload", { method: "POST", body: fd });

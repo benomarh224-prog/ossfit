@@ -102,7 +102,7 @@ export function ClientApp() {
               <Logo className="h-5 w-5" />
             </span>
             <div>
-              <p className="font-display text-lg font-bold uppercase leading-none">{content?.brandName || "Atlas Coach"}</p>
+              <p className="font-display text-lg font-bold uppercase leading-none">{content?.brandName || "Coach Oussama"}</p>
               <Badge variant="outline" className="mt-0.5 text-[10px] uppercase text-primary">{t("nav.dashboard")}</Badge>
             </div>
           </div>

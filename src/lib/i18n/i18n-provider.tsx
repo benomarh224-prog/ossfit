@@ -20,6 +20,7 @@ export const useI18nStore = create<I18nState>()(
     }),
     {
       name: "atlas-i18n",
+      skipHydration: true,
       // Only persist the locale — never the functions, so the store can never
       // be corrupted by stale/serialized function values.
       partialize: (state) => ({ locale: state.locale }) as I18nState,
@@ -57,6 +58,7 @@ const I18nContext = createContext<I18nState | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const store = useI18nStore();
+  useEffect(() => { void useI18nStore.persist.rehydrate(); }, []);
   useEffect(() => {
     const el = document.documentElement;
     el.lang = store.locale;

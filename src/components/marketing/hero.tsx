@@ -59,7 +59,7 @@ export function Hero({ content }: { content: Content }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img
             src={content.heroImage}
-            alt="Atlas Coach — online personal trainer"
+            alt="Coach Oussama — online personal trainer"
             className="h-full w-full object-cover object-center"
           />
         ) : null}
@@ -78,7 +78,7 @@ export function Hero({ content }: { content: Content }) {
           <motion.div variants={item}>
             <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Tetouan · Online across Morocco
+              {locale === "ar" ? "أسامة · تدريب شخصي عبر الإنترنت" : locale === "fr" ? "Oussama · Coaching personnel en ligne" : "Oussama · Personal coaching, online"}
             </span>
           </motion.div>
 

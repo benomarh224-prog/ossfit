@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getSiteContent, parseJSON } from "@/lib/server-utils";
+import { getSiteContent, parseJSON, requireAuth } from "@/lib/server-utils";
+import { publicSiteContent } from "@/lib/site-content";
 
 export async function GET() {
+  const session = await requireAuth();
   const content = await getSiteContent();
   const services = await db.service.findMany({
     where: { published: true },
@@ -13,11 +15,11 @@ export async function GET() {
     orderBy: { order: "asc" },
   });
   const testimonials = await db.testimonial.findMany({
-    where: { published: true },
+    where: { published: true, consent: true },
     orderBy: { order: "asc" },
   });
   const transformations = await db.transformation.findMany({
-    where: { published: true },
+    where: { published: true, consent: true },
     orderBy: { order: "asc" },
   });
   const faqs = await db.fAQ.findMany({
@@ -27,7 +29,7 @@ export async function GET() {
 
   return NextResponse.json({
     content: {
-      ...content,
+      ...(session ? content : publicSiteContent(content)),
       heroStats: {
         clients: content.heroStatClients,
         programs: content.heroStatPrograms,

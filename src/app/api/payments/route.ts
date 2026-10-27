@@ -2,13 +2,12 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/server-utils";
+import { randomUUID } from "node:crypto";
 
 const schema = z.object({
+  packageId: z.string().min(1),
   subscriptionId: z.string().optional(),
-  packageTitle: z.string().min(2),
-  amountMAD: z.number().int().positive(),
-  proofUrl: z.string().optional(),
-  method: z.string().default("BANK_TRANSFER"),
+  proofUrl: z.string().regex(/^\/api\/uploads\/[a-zA-Z0-9_-]+$/),
 });
 
 // POST — client records a payment (manual bank transfer with proof upload)
@@ -30,18 +29,26 @@ export async function POST(req: NextRequest) {
   }
   const d = parsed.data;
 
-  const invoiceNo = `INV-${Date.now().toString().slice(-8)}`;
-  const payment = await db.payment.create({
-    data: {
-      userId: session.user.id,
-      subscriptionId: d.subscriptionId,
-      packageTitle: d.packageTitle,
-      amountMAD: d.amountMAD,
-      method: d.method,
-      proofUrl: d.proofUrl,
-      invoiceNo,
-      status: "PENDING",
-    },
+  const [pkg, proof, requestedSub] = await Promise.all([
+    db.package.findFirst({ where: { id: d.packageId, available: true } }),
+    db.uploadedFile.findFirst({ where: { id: d.proofUrl.split("/").pop(), ownerId: session.user.id, visibility: "PRIVATE" } }),
+    d.subscriptionId ? db.subscription.findFirst({ where: { id: d.subscriptionId, userId: session.user.id, packageId: d.packageId } }) : Promise.resolve(null),
+  ]);
+  if (!pkg) return NextResponse.json({ error: "This package is no longer available" }, { status: 400 });
+  if (!proof) return NextResponse.json({ error: "Upload your payment proof first" }, { status: 400 });
+  if (d.subscriptionId && !requestedSub) return NextResponse.json({ error: "Subscription not found" }, { status: 404 });
+  const payment = await db.$transaction(async (tx) => {
+    const subscription = requestedSub ?? await tx.subscription.findFirst({
+      where: { userId: session.user.id, packageId: pkg.id, status: "PENDING" },
+    }) ?? await tx.subscription.create({ data: {
+      userId: session.user.id, packageId: pkg.id, amountMAD: pkg.priceMAD, status: "PENDING",
+    } });
+    return tx.payment.create({ data: {
+      userId: session.user.id, subscriptionId: subscription.id,
+      packageTitle: pkg.title, amountMAD: subscription.amountMAD,
+      method: "BANK_TRANSFER", proofUrl: d.proofUrl,
+      invoiceNo: `INV-${randomUUID().slice(0, 12).toUpperCase()}`, status: "PENDING",
+    } });
   });
 
   // notify coach
@@ -51,7 +58,7 @@ export async function POST(req: NextRequest) {
       data: {
         userId: coach.id,
         title: "New payment to verify",
-        body: `${d.packageTitle} — ${d.amountMAD} MAD`,
+        body: `${payment.packageTitle} — ${payment.amountMAD} MAD`,
         type: "payment",
       },
     });

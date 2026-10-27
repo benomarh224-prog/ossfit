@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -11,6 +11,7 @@ import { X, Loader2, Dumbbell } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { apiFetch } from "@/lib/client-utils";
+import { isValidMoroccanPhone, normalizeMoroccanPhone } from "@/lib/phone";
 import {
   Dialog,
   DialogContent,
@@ -36,7 +37,7 @@ const registerSchema = z
     name: z.string().min(2),
     email: z.string().email(),
     password: z.string().min(8),
-    phone: z.string().regex(/^(?:\+212|0)[5-7]\d{8}$/, "Use a valid Moroccan number (06/07/+212)"),
+    phone: z.string().refine(isValidMoroccanPhone, "Use a valid Moroccan number (06/07/+212)").transform(normalizeMoroccanPhone),
   });
 
 type LoginValues = z.infer<typeof loginSchema>;
@@ -54,25 +55,30 @@ export function AuthModal({
   const { t } = useI18n();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [tab, setTab] = useState(defaultTab);
+  useEffect(() => { if (open) setTab(defaultTab); }, [open, defaultTab]);
 
   const loginForm = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
   const registerForm = useForm<RegisterValues>({ resolver: zodResolver(registerSchema) });
 
   async function onLogin(values: LoginValues) {
     setLoading(true);
-    const res = await signIn("credentials", {
-      email: values.email,
-      password: values.password,
-      redirect: false,
-    });
-    setLoading(false);
-    if (res?.error) {
-      toast.error("Invalid email or password");
-      return;
+    try {
+      const res = await signIn("credentials", {
+        email: values.email, password: values.password, redirect: false,
+      });
+      if (res?.error) {
+        toast.error("Invalid email or password");
+        return;
+      }
+      toast.success(t("auth.loginTitle"));
+      onOpenChange(false);
+      router.refresh();
+    } catch {
+      toast.error("Unable to sign in. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    toast.success(t("auth.loginTitle"));
-    onOpenChange(false);
-    router.refresh();
   }
 
   async function onRegister(values: RegisterValues) {
@@ -107,7 +113,7 @@ export function AuthModal({
               <Dumbbell className="h-6 w-6" />
             </div>
             <div>
-              <h2 className="font-display text-2xl uppercase tracking-tight">Atlas Coach</h2>
+              <h2 className="font-display text-2xl uppercase tracking-tight">Coach Oussama</h2>
               <p className="text-sm text-muted-foreground">{t("auth.loginSubtitle")}</p>
             </div>
             <button
@@ -119,7 +125,7 @@ export function AuthModal({
             </button>
           </div>
           <div className="p-6">
-            <Tabs defaultValue={defaultTab} className="w-full">
+            <Tabs value={tab} onValueChange={(value) => setTab(value as "login" | "register")} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">{t("nav.login")}</TabsTrigger>
                 <TabsTrigger value="register">{t("nav.register")}</TabsTrigger>
@@ -156,9 +162,6 @@ export function AuthModal({
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {t("auth.login")}
                   </Button>
-                  <p className="rounded-md border border-dashed border-primary/40 bg-primary/5 p-2 text-center text-xs text-muted-foreground">
-                    {t("auth.demoNote")}
-                  </p>
                 </form>
               </TabsContent>
 
@@ -177,18 +180,18 @@ export function AuthModal({
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="r-email">{t("auth.email")}</Label>
-                    <Input id="r-email" type="email" {...registerForm.register("email")} />
+                    <Input id="r-email" type="email" autoComplete="email" {...registerForm.register("email")} />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="r-phone">{t("auth.phone")}</Label>
-                    <Input id="r-phone" placeholder="06XXXXXXXX or +2126..." {...registerForm.register("phone")} />
+                    <Input id="r-phone" type="tel" autoComplete="tel" placeholder="06XXXXXXXX or +2126..." {...registerForm.register("phone")} />
                     {registerForm.formState.errors.phone && (
                       <p className="text-xs text-destructive">{registerForm.formState.errors.phone.message}</p>
                     )}
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="r-pass">{t("auth.password")}</Label>
-                    <Input id="r-pass" type="password" {...registerForm.register("password")} />
+                    <Input id="r-pass" type="password" autoComplete="new-password" {...registerForm.register("password")} />
                     {registerForm.formState.errors.password && (
                       <p className="text-xs text-destructive">{registerForm.formState.errors.password.message}</p>
                     )}

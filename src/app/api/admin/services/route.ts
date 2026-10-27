@@ -15,7 +15,8 @@ const schema = z.object({
 });
 
 export async function GET() {
-  await requireCoach();
+  const session = await requireCoach();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const services = await db.service.findMany({ orderBy: { order: "asc" } });
   return NextResponse.json({
     services: services.map((s) => ({ ...s, features: parseJSON<string[]>(s.features, []) })),

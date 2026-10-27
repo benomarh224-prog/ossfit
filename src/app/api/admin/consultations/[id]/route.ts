@@ -9,7 +9,8 @@ const schema = z.object({
   coachNote: z.string().optional(),
 });
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await requireCoach();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   let body: unknown;
@@ -19,9 +20,9 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const d = parsed.data;
 
   const booking = await db.consultationBooking.update({
-    where: { id: params.id },
+    where: { id: id },
     data: d,
-    include: { user: true, slot: true },
+    include: { user: { select: { id: true, name: true, email: true, phone: true } }, slot: true },
   });
 
   // free the slot if rejected/cancelled
@@ -54,16 +55,17 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   return NextResponse.json({ ok: true, booking });
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await requireCoach();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const booking = await db.consultationBooking.findUnique({ where: { id: params.id } });
+  const booking = await db.consultationBooking.findUnique({ where: { id: id } });
   if (booking) {
     await db.consultationSlot.update({
       where: { id: booking.slotId },
       data: { booked: false },
     }).catch(() => {});
-    await db.consultationBooking.delete({ where: { id: params.id } });
+    await db.consultationBooking.delete({ where: { id: id } });
   }
   return NextResponse.json({ ok: true });
 }

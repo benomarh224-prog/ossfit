@@ -1,6 +1,6 @@
 // Client-safe helpers (no db / server-only imports).
 export function buildWhatsappLink(number: string | undefined | null, message: string) {
-  const n = number || "+212600000000";
+  const n = number || "+212610296995";
   const clean = n.replace(/[^\d]/g, "");
   return `https://wa.me/${clean}?text=${encodeURIComponent(message)}`;
 }
@@ -31,6 +31,7 @@ export async function apiFetch<T = any>(
 }
 
 export async function uploadFile(file: File): Promise<string> {
+  if (file.size > 3 * 1024 * 1024) throw new Error("Choose an image smaller than 3 MB");
   const fd = new FormData();
   fd.append("file", file);
   const res = await fetch("/api/upload", { method: "POST", body: fd });

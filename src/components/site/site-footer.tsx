@@ -15,7 +15,7 @@ type SiteContent = {
   facebookUrl?: string | null;
 };
 
-export function SiteFooter({ content }: { content: SiteContent | null }) {
+export function SiteFooter({ content, showResults = false }: { content: SiteContent | null; showResults?: boolean }) {
   const { t } = useI18n();
 
   const wa = buildWhatsappLink(
@@ -33,7 +33,7 @@ export function SiteFooter({ content }: { content: SiteContent | null }) {
                 <Dumbbell className="h-5 w-5" />
               </span>
               <span className="font-display text-lg font-bold uppercase tracking-tight">
-                {content?.brandName || "Atlas Coach"}
+                {content?.brandName || "Coach Oussama"}
               </span>
             </Link>
             <p className="mt-4 max-w-sm text-sm text-muted-foreground">
@@ -75,7 +75,7 @@ export function SiteFooter({ content }: { content: SiteContent | null }) {
               <li><Link href="#about" className="hover:text-primary">{t("nav.about")}</Link></li>
               <li><Link href="#services" className="hover:text-primary">{t("nav.services")}</Link></li>
               <li><Link href="#packages" className="hover:text-primary">{t("nav.packages")}</Link></li>
-              <li><Link href="#results" className="hover:text-primary">{t("nav.results")}</Link></li>
+              {showResults && <li><Link href="#results" className="hover:text-primary">{t("nav.results")}</Link></li>}
               <li><Link href="#faq" className="hover:text-primary">{t("nav.faq")}</Link></li>
             </ul>
           </div>
@@ -112,7 +112,7 @@ export function SiteFooter({ content }: { content: SiteContent | null }) {
 
       <div className="border-t border-border/50">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:px-6 lg:px-8">
-          <p>© {new Date().getFullYear()} {content?.brandName || "Atlas Coach"}. {t("footer.rights")}</p>
+          <p>© {new Date().getFullYear()} {content?.brandName || "Coach Oussama"}. {t("footer.rights")}</p>
           <p>{t("footer.madeIn")}</p>
         </div>
       </div>

@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
+import { siteOrigin } from "@/lib/site-url";
 
 export default function robots(): MetadataRoute.Robots {
-  const base = process.env.NEXTAUTH_URL?.replace(/\/$/, "") || "https://atlas-coach.ma";
+  const base = siteOrigin();
   return {
     rules: [
-      { userAgent: "*", allow: "/", disallow: ["/api/"] },
+      { userAgent: "*", allow: "/", disallow: ["/api/", "/setup"] },
     ],
     sitemap: `${base}/sitemap.xml`,
     host: base,

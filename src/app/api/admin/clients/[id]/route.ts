@@ -8,7 +8,8 @@ const schema = z.object({
 });
 
 // PATCH — approve / reject / change status of a client profile
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
   const session = await requireCoach();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
@@ -24,23 +25,23 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   }
   const { status } = parsed.data;
 
-  const profile = await db.clientProfile.findUnique({ where: { userId: params.id } });
+  const profile = await db.clientProfile.findUnique({ where: { userId: id } });
   if (!profile) return NextResponse.json({ error: "Client profile not found" }, { status: 404 });
 
   const updated = await db.clientProfile.update({
-    where: { userId: params.id },
+    where: { userId: id },
     data: { status: status ?? "ACTIVE" },
   });
 
   // if approved, activate their pending subscription
   if (status === "ACTIVE" || status === "APPROVED") {
     await db.subscription.updateMany({
-      where: { userId: params.id, status: "PENDING" },
+      where: { userId: id, status: "PENDING" },
       data: { status: "ACTIVE", startDate: new Date(), endDate: new Date(Date.now() + 30 * 86400000) },
     });
     await db.notification.create({
       data: {
-        userId: params.id,
+        userId: id,
         title: "Your application has been approved",
         body: "Welcome aboard! Your coaching program is now active.",
         type: "success",
@@ -50,7 +51,7 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (status === "REJECTED") {
     await db.notification.create({
       data: {
-        userId: params.id,
+        userId: id,
         title: "Application update",
         body: "Your coaching application could not be approved at this time. Contact the coach for details.",
         type: "info",

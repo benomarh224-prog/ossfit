@@ -4,7 +4,7 @@ import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/server-utils";
 
 const schema = z.object({
-  url: z.string().min(1, "Image required"),
+  url: z.string().regex(/^\/api\/uploads\/[a-zA-Z0-9_-]+$/, "Upload an image first"),
   type: z.enum(["front", "side", "back"]).default("front"),
   note: z.string().optional(),
 });
@@ -34,6 +34,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid input" }, { status: 400 });
   }
   const d = parsed.data;
+  const upload = await db.uploadedFile.findFirst({ where: {
+    id: d.url.split("/").pop(), ownerId: session.user.id, visibility: "PRIVATE",
+  } });
+  if (!upload) return NextResponse.json({ error: "Image not found" }, { status: 400 });
   const photo = await db.progressPhoto.create({
     data: { ...d, userId: session.user.id, takenAt: new Date() },
   });

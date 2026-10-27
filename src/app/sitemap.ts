@@ -1,18 +1,10 @@
 import type { MetadataRoute } from "next";
+import { siteOrigin } from "@/lib/site-url";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const base = process.env.NEXTAUTH_URL?.replace(/\/$/, "") || "https://atlas-coach.ma";
+  const base = siteOrigin();
   const lastModified = new Date();
-  const sections = [
-    "",
-    "#about",
-    "#services",
-    "#how",
-    "#packages",
-    "#results",
-    "#testimonials",
-    "#faq",
-  ];
+  const sections = ["", "privacy", "terms"];
   return sections.map((s) => ({
     url: `${base}/${s}`,
     lastModified,

@@ -2,6 +2,7 @@ import type { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
+import { allowRequest, requestIp } from "@/lib/rate-limit";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
@@ -15,8 +16,11 @@ export const authOptions: NextAuthOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null;
+        if (credentials.password.length > 256 || credentials.email.length > 254) return null;
+        const headers = new Headers(Object.entries(req.headers ?? {}).map(([key, value]): [string, string] => [key, Array.isArray(value) ? value.join(",") : String(value ?? "")]));
+        if (!await allowRequest("login", requestIp(headers), 30, 15 * 60 * 1000)) return null;
         const email = credentials.email.toLowerCase().trim();
         const user = await db.user.findUnique({
           where: { email },
@@ -51,14 +55,17 @@ export const authOptions: NextAuthOptions = {
         if (u) {
           token.role = u.role;
           token.onboarded = u.clientProfile?.onboarded ?? false;
+        } else {
+          token.id = undefined;
+          token.role = undefined;
         }
       }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        (session.user as any).id = token.id;
-        (session.user as any).role = token.role;
+        (session.user as any).id = token.id ?? "";
+        (session.user as any).role = token.role ?? "";
         (session.user as any).onboarded = token.onboarded;
       }
       return session;

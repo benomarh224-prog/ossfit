@@ -12,7 +12,8 @@ const schema = z.object({
 });
 
 export async function GET() {
-  await requireCoach();
+  const session = await requireCoach();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const items = await db.fAQ.findMany({ orderBy: { order: "asc" } });
   return NextResponse.json({ faqs: items });
 }

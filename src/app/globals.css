@@ -129,6 +129,7 @@
   html {
     scroll-behavior: smooth;
   }
+  section[id] { scroll-margin-top: 5rem; }
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "ss01", "cv01";
@@ -137,7 +138,9 @@
   /* RTL support for Arabic */
   [dir="rtl"] {
     text-align: right;
+    font-family: var(--font-arabic), sans-serif;
   }
+  [dir="rtl"] .font-display { font-family: var(--font-arabic), sans-serif; letter-spacing: 0; line-height: 1.6; }
   /* Premium scrollbar */
   ::-webkit-scrollbar {
     width: 10px;

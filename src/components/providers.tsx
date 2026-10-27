@@ -5,6 +5,7 @@ import { ThemeProvider } from "next-themes";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactNode, useState } from "react";
 import { I18nProvider } from "@/lib/i18n/i18n-provider";
+import { MotionConfig } from "framer-motion";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [client] = useState(
@@ -25,7 +26,7 @@ export function Providers({ children }: { children: ReactNode }) {
         disableTransitionOnChange
       >
         <QueryClientProvider client={client}>
-          <I18nProvider>{children}</I18nProvider>
+          <MotionConfig reducedMotion="user"><I18nProvider>{children}</I18nProvider></MotionConfig>
         </QueryClientProvider>
       </ThemeProvider>
     </SessionProvider>

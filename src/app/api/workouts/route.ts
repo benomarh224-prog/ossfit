@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 const logSchema = z.object({
   planId: z.string().optional(),
   planTitle: z.string().optional(),
-  dayJson: z.record(z.any()),
+  dayJson: z.record(z.string(), z.unknown()),
   durationMin: z.number().optional(),
   notes: z.string().optional(),
 });

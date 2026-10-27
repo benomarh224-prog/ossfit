@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { signOut, useSession } from "next-auth/react";
 import { ArrowRight, ArrowLeft, Check, Loader2, Dumbbell, ShieldCheck } from "lucide-react";
 import { toast } from "sonner";
 import { useI18n, formatMAD } from "@/lib/i18n/i18n-provider";
@@ -21,9 +22,9 @@ import { Card, CardContent } from "@/components/ui/card";
 
 const schema = z.object({
   fullName: z.string().min(2),
-  age: z.coerce.number().int().min(13).max(100),
-  heightCm: z.coerce.number().min(120).max(230),
-  weightKg: z.coerce.number().min(35).max(250),
+  age: z.coerce.number<number>().int().min(13).max(100),
+  heightCm: z.coerce.number<number>().min(120).max(230),
+  weightKg: z.coerce.number<number>().min(35).max(250),
   city: z.string().min(2),
   goal: z.enum(["muscle", "fat_loss", "recomp", "strength", "health"]),
   experience: z.enum(["beginner", "intermediate", "advanced"]),
@@ -69,6 +70,8 @@ const AVAIL = [
 export function Onboarding({ packages }: { packages: any[] }) {
   const { t, locale } = useI18n();
   const router = useRouter();
+  const queryClient = useQueryClient();
+  const { update } = useSession();
   const [step, setStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
@@ -83,6 +86,10 @@ export function Onboarding({ packages }: { packages: any[] }) {
     },
     mode: "onChange",
   });
+  useEffect(() => {
+    const preferred = sessionStorage.getItem("preferredPackageId");
+    if (preferred && packages.some((item) => item.id === preferred)) form.setValue("preferredPackageId", preferred);
+  }, [packages, form]);
 
   const goal = form.watch("goal");
   const experience = form.watch("experience");
@@ -131,10 +138,13 @@ export function Onboarding({ packages }: { packages: any[] }) {
       toast.error(t("onboarding.consent"));
       return;
     }
-    const values = form.getValues();
+    const values = schema.parse(form.getValues());
     setSubmitting(true);
     try {
       await apiFetch("/api/onboarding", { json: values });
+      sessionStorage.removeItem("preferredPackageId");
+      await update();
+      await queryClient.invalidateQueries({ queryKey: ["me"] });
       toast.success(t("onboarding.success"));
       router.refresh();
     } catch (e: any) {
@@ -390,6 +400,9 @@ export function Onboarding({ packages }: { packages: any[] }) {
             </div>
           </CardContent>
         </Card>
+        <Button type="button" variant="ghost" className="mt-5 w-full text-muted-foreground" onClick={() => signOut({ callbackUrl: "/" })}>
+          {t("nav.logout")}
+        </Button>
       </div>
     </div>
   );

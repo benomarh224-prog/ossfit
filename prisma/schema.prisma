@@ -36,6 +36,9 @@ model User {
   payments        Payment[]
   bookings        ConsultationBooking[]
   workoutLogs     WorkoutLog[]
+  workoutPlans    WorkoutPlan[]
+  nutritionPlans  NutritionPlan[]
+  uploads         UploadedFile[]
   mealLogs        MealLog[]
   waterLogs      WaterLog[]
   checkIns       CheckIn[]
@@ -80,22 +83,47 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model UploadedFile {
+  id          String   @id @default(cuid())
+  ownerId     String
+  pathname    String   @unique
+  contentType String
+  size        Int
+  visibility  String   @default("PRIVATE")
+  createdAt   DateTime @default(now())
+  owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  @@index([ownerId, createdAt])
+}
+
+model RateLimit {
+  id        String   @id
+  count     Int      @default(1)
+  expiresAt DateTime
+  @@index([expiresAt])
+}
+
+model CoachSetup {
+  id        String   @id
+  createdAt DateTime @default(now())
+}
+
 // ---------------------------------------------------------------------------
 // Public site content (editable from the admin dashboard)
 // ---------------------------------------------------------------------------
 
 model SiteContent {
   id              String   @id @default("singleton")
-  brandName       String   @default("ATLAS COACH")
-  coachName       String   @default("Youssef El Amrani")
-  coachCity       String   @default("Tetouan, Morocco")
-  whatsappNumber  String   @default("+212600000000")
+  brandName       String   @default("COACH OUSSAMA")
+  coachName       String   @default("Oussama")
+  coachCity       String   @default("Morocco")
+  whatsappNumber  String   @default("+212610296995")
   whatsappEnabled Boolean  @default(true)
   heroImage       String   @default("/images/hero.jpg")
-  coachPortrait   String   @default("/images/coach-portrait.jpg")
-  heroTitle       String   @default("TRANSFORM YOUR BODY. TRANSFORM YOUR LIFE.")
-  heroSubtitle    String   @default("Professional online personal training from Tetouan, available across Morocco. Personalized workouts, nutrition guidance, and real coaching support.")
-  aboutStory      String   @default("Born and raised in Tetouan, I have dedicated my life to understanding the science of physical transformation. My mission is to make professional, science-based coaching accessible to every Moroccan who is ready to commit to change.")
+  coachPortrait   String   @default("/images/service-coaching.jpg")
+  heroTitle       String   @default("YOUR GOAL. YOUR PLAN. YOUR PROGRESS.")
+  heroSubtitle    String   @default("Build a stronger routine with Coach Oussama. Personal training, practical nutrition guidance and a private space to track every step — wherever you train.")
+  aboutStory      String   @default("Your training should fit your life. We start with your goals, experience and available equipment, then build a practical plan around you. Your private dashboard keeps your workouts, check-ins and coach conversations together.")
   aboutPhilosophy String   @default("I believe in sustainable, evidence-based methods. No shortcuts, no gimmicks — only structured programming, disciplined nutrition, and honest coaching that respects your body and your time.")
   bankName        String?
   bankAccountName String?
@@ -266,6 +294,7 @@ model WorkoutPlan {
   active    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model WorkoutLog {
@@ -299,6 +328,7 @@ model NutritionPlan {
   active       Boolean  @default(false)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  user         User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
 
 model MealLog {
