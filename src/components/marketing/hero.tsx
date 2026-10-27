@@ -97,17 +97,17 @@ export function Hero({ content }: { content: Content }) {
           </motion.p>
 
           <motion.div variants={item} className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <a href="#packages">
-              <Button size="lg" className="group w-full bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto">
+            <Button asChild size="lg" className="group w-full bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto">
+              <a href="#packages">
                 {t("hero.primaryCta")}
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-              </Button>
-            </a>
-            <a href="#services">
-              <Button size="lg" variant="outline" className="w-full border-border/60 bg-background/40 backdrop-blur-sm hover:bg-accent sm:w-auto">
+              </a>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="w-full border-border/60 bg-background/40 backdrop-blur-sm hover:bg-accent sm:w-auto">
+              <a href="#packages">
                 {t("hero.secondaryCta")}
-              </Button>
-            </a>
+              </a>
+            </Button>
             {content.whatsappEnabled !== false && (
               <a href={wa} target="_blank" rel="noreferrer" className="inline-flex">
                 <Button size="lg" variant="ghost" className="w-full text-foreground/80 hover:text-primary sm:w-auto">

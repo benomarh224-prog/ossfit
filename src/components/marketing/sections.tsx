@@ -171,12 +171,12 @@ export function MeetCoach({ content }: { content: any }) {
                   {t("coach.contactWhatsapp")}
                 </Button>
               </a>
-              <a href="#packages">
-                <Button variant="outline" className="border-border/60">
+              <Button asChild variant="outline" className="border-border/60">
+                <a href="#packages">
                   {t("cta.explore")}
                   <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </a>
+                </a>
+              </Button>
             </div>
           </div>
         </div>
