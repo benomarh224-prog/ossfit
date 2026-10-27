@@ -1,0 +1,21 @@
+# Dependencies and build output
+node_modules/
+.next/
+out/
+dist/
+
+# Local configuration and data
+.env
+.env.*
+!.env.example
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+public/uploads/
+
+# Logs and local artifacts
+*.log
+atlas-coach-source.zip
+.DS_Store
+Thumbs.db

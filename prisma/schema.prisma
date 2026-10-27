@@ -1,0 +1,441 @@
+// Prisma schema for the premium online personal trainer platform.
+// SQLite is used as the local database (project constraint). All list-like
+// fields are stored as JSON-encoded strings because SQLite does not support
+// native arrays or enums.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Authentication (NextAuth.js v4 compatible)
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  password      String?
+  role          String    @default("CLIENT") // CLIENT | COACH | ADMIN
+  image         String?
+  phone         String?
+  whatsapp     String?
+  emailVerified DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts        Account[]
+  sessions        Session[]
+  clientProfile   ClientProfile?
+  coachMessages  Message[]       @relation("CoachMessages")
+  clientMessages  Message[]       @relation("ClientMessages")
+  payments        Payment[]
+  bookings        ConsultationBooking[]
+  workoutLogs     WorkoutLog[]
+  mealLogs        MealLog[]
+  waterLogs      WaterLog[]
+  checkIns       CheckIn[]
+  progressPhotos ProgressPhoto[]
+  subscriptions  Subscription[]
+  notifications   Notification[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires     DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---------------------------------------------------------------------------
+// Public site content (editable from the admin dashboard)
+// ---------------------------------------------------------------------------
+
+model SiteContent {
+  id              String   @id @default("singleton")
+  brandName       String   @default("ATLAS COACH")
+  coachName       String   @default("Youssef El Amrani")
+  coachCity       String   @default("Tetouan, Morocco")
+  whatsappNumber  String   @default("+212600000000")
+  whatsappEnabled Boolean  @default(true)
+  heroImage       String   @default("/images/hero.jpg")
+  coachPortrait   String   @default("/images/coach-portrait.jpg")
+  heroTitle       String   @default("TRANSFORM YOUR BODY. TRANSFORM YOUR LIFE.")
+  heroSubtitle    String   @default("Professional online personal training from Tetouan, available across Morocco. Personalized workouts, nutrition guidance, and real coaching support.")
+  aboutStory      String   @default("Born and raised in Tetouan, I have dedicated my life to understanding the science of physical transformation. My mission is to make professional, science-based coaching accessible to every Moroccan who is ready to commit to change.")
+  aboutPhilosophy String   @default("I believe in sustainable, evidence-based methods. No shortcuts, no gimmicks — only structured programming, disciplined nutrition, and honest coaching that respects your body and your time.")
+  bankName        String?
+  bankAccountName String?
+  bankIban        String?
+  bankRIB         String?
+  paymentInstructions String @default("Transfer the monthly amount to the bank account below, then upload the payment proof in your dashboard. Your subscription is activated after the coach verifies the payment.")
+  heroStatClients   Int @default(0)
+  heroStatPrograms  Int @default(0)
+  heroStatYears     Int @default(0)
+  heroStatSuccess   Int @default(0)
+  statsVerified   Boolean  @default(false)
+  instagramUrl    String?
+  tiktokUrl      String?
+  youtubeUrl     String?
+  facebookUrl    String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  shortDesc   String
+  longDesc    String
+  icon        String   @default("dumbbell")
+  image       String?
+  features    String   @default("[]") // JSON string array
+  order       Int      @default(0)
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Package {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  tagline       String
+  priceMAD      Int
+  durationLabel String   @default("Per month")
+  features      String   @default("[]") // JSON string array
+  supportLevel  String   @default("Standard support")
+  available     Boolean  @default(true)
+  featured      Boolean  @default(false)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  clientProfiles ClientProfile[]
+  subscriptions  Subscription[]
+}
+
+model Testimonial {
+  id         String   @id @default(cuid())
+  clientName String
+  clientCity String?
+  avatar     String?
+  rating     Int      @default(5)
+  quote      String
+  goal       String?
+  duration   String?
+  published  Boolean  @default(false)
+  consent    Boolean  @default(false)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Transformation {
+  id        String   @id @default(cuid())
+  clientName String
+  beforeImg String?
+  afterImg  String?
+  goal      String?
+  duration  String?
+  story     String?
+  published Boolean  @default(false)
+  consent   Boolean  @default(false)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FAQ {
+  id        String   @id @default(cuid())
+  question String
+  answer   String
+  category String   @default("General")
+  order    Int      @default(0)
+  published Boolean @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ---------------------------------------------------------------------------
+// Client onboarding & subscriptions
+// ---------------------------------------------------------------------------
+
+model ClientProfile {
+  id                 String   @id @default(cuid())
+  userId             String   @unique
+  fullName           String
+  age                Int?
+  heightCm           Float?
+  weightKg           Float?
+  goal               String?  // muscle | fat_loss | recomp | strength | health
+  experience         String?  // beginner | intermediate | advanced
+  equipment          String   @default("[]") // JSON string array
+  weeklyAvailability String?  // 2-3 | 4-5 | 6+
+  preferredPackageId String?
+  limitations        String?
+  injuryConsent      Boolean  @default(false)
+  onboarded          Boolean  @default(false)
+  status             String   @default("PENDING") // PENDING | APPROVED | ACTIVE | REJECTED | PAUSED
+  city               String?
+  phone              String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  preferredPkg  Package? @relation(fields: [preferredPackageId], references: [id])
+}
+
+model Subscription {
+  id           String   @id @default(cuid())
+  userId       String
+  packageId    String
+  status       String   @default("PENDING") // PENDING | ACTIVE | EXPIRED | CANCELLED
+  startDate    DateTime?
+  endDate      DateTime?
+  amountMAD    Int
+  note         String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package Package @relation(fields: [packageId], references: [id])
+  payments Payment[]
+}
+
+// ---------------------------------------------------------------------------
+// Workouts & exercises
+// ---------------------------------------------------------------------------
+
+model ExerciseLibrary {
+  id           String   @id @default(cuid())
+  name         String
+  muscleGroup  String?
+  equipment    String?
+  image        String?
+  videoUrl     String?
+  instructions String?
+  defaultSets Int?
+  defaultReps  String?
+  defaultRest String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model WorkoutPlan {
+  id        String   @id @default(cuid())
+  userId    String?
+  title     String
+  goal      String?
+  summary   String?
+  daysJson  String   @default("[]") // JSON array of days w/ exercises
+  active    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WorkoutLog {
+  id        String   @id @default(cuid())
+  userId    String
+  planId    String?
+  planTitle String?
+  dayJson   String   @default("{}")
+  completedAt DateTime @default(now())
+  durationMin Int?
+  notes     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Nutrition
+// ---------------------------------------------------------------------------
+
+model NutritionPlan {
+  id           String   @id @default(cuid())
+  userId       String?
+  title        String
+  dailyCalories Int?
+  proteinG     Int?
+  carbsG       Int?
+  fatsG        Int?
+  waterCupsGoal Int @default(8)
+  mealsJson    String   @default("[]") // JSON meal suggestions
+  notes        String?
+  active       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model MealLog {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime   @default(now())
+  mealType String   // breakfast | lunch | dinner | snack
+  description String
+  calories Int?
+  proteinG Int?
+  carbsG   Int?
+  fatsG    Int?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model WaterLog {
+  id        String   @id @default(cuid())
+  userId    String
+  date      DateTime @default(now())
+  cups      Int      @default(1)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Progress & check-ins
+// ---------------------------------------------------------------------------
+
+model ProgressPhoto {
+  id        String   @id @default(cuid())
+  userId    String
+  url       String
+  type      String   @default("front") // front | side | back
+  takenAt   DateTime @default(now())
+  note      String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model CheckIn {
+  id        String   @id @default(cuid())
+  userId    String
+  weekLabel String
+  weightKg  Float?
+  sleepHours Float?
+  energyLevel Int?
+  adherencePercent Int?
+  notes     String?
+  status    String   @default("SUBMITTED") // SUBMITTED | REVIEWED
+  coachReply String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Messaging
+// ---------------------------------------------------------------------------
+
+model Message {
+  id        String   @id @default(cuid())
+  coachId   String
+  clientId  String
+  sender    String   // COACH | CLIENT
+  body      String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  coach  User @relation("CoachMessages",  fields: [coachId],  references: [id], onDelete: Cascade)
+  client User @relation("ClientMessages", fields: [clientId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  body      String
+  type      String   @default("info")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Consultation booking
+// ---------------------------------------------------------------------------
+
+model ConsultationSlot {
+  id        String   @id @default(cuid())
+  start     DateTime
+  end       DateTime
+  booked    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  bookings ConsultationBooking[]
+}
+
+model ConsultationBooking {
+  id        String   @id @default(cuid())
+  userId    String
+  slotId    String
+  goals     String
+  status    String   @default("REQUESTED") // REQUESTED | APPROVED | REJECTED | COMPLETED | CANCELLED
+  meetingLink String?
+  coachNote String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slot ConsultationSlot @relation(fields: [slotId], references: [id], onDelete: Cascade)
+}
+
+// ---------------------------------------------------------------------------
+// Payments (manual bank transfer workflow)
+// ---------------------------------------------------------------------------
+
+model Payment {
+  id           String   @id @default(cuid())
+  userId       String
+  subscriptionId String?
+  packageTitle String
+  amountMAD    Int
+  method       String   @default("BANK_TRANSFER")
+  proofUrl     String?
+  status       String   @default("PENDING") // PENDING | VERIFIED | REJECTED
+  coachNote    String?
+  invoiceNo    String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+}

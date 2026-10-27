@@ -1,0 +1,33 @@
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import { db } from "@/lib/db";
+import { requireCoach } from "@/lib/server-utils";
+
+const schema = z.object({
+  clientName: z.string().min(2),
+  beforeImg: z.string().optional(),
+  afterImg: z.string().optional(),
+  goal: z.string().optional(),
+  duration: z.string().optional(),
+  story: z.string().optional(),
+  published: z.boolean().default(false),
+  consent: z.boolean().default(false),
+  order: z.number().int().default(0),
+});
+
+export async function GET() {
+  await requireCoach();
+  const items = await db.transformation.findMany({ orderBy: { order: "asc" } });
+  return NextResponse.json({ transformations: items });
+}
+
+export async function POST(req: NextRequest) {
+  const session = await requireCoach();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  let body: unknown;
+  try { body = await req.json(); } catch { return NextResponse.json({ error: "Invalid" }, { status: 400 }); }
+  const parsed = schema.safeParse(body);
+  if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
+  const created = await db.transformation.create({ data: parsed.data });
+  return NextResponse.json({ ok: true, transformation: created });
+}
