@@ -109,12 +109,12 @@ export function Hero({ content }: { content: Content }) {
               </a>
             </Button>
             {content.whatsappEnabled !== false && (
-              <a href={wa} target="_blank" rel="noreferrer" className="inline-flex">
-                <Button size="lg" variant="ghost" className="w-full text-foreground/80 hover:text-primary sm:w-auto">
+              <Button asChild size="lg" variant="ghost" className="w-full text-foreground/80 hover:text-primary sm:w-auto">
+                <a href={wa} target="_blank" rel="noreferrer">
                   <MessageCircle className="mr-2 h-5 w-5 text-[#25D366]" />
                   {t("hero.whatsapp")}
-                </Button>
-              </a>
+                </a>
+              </Button>
             )}
           </motion.div>
 

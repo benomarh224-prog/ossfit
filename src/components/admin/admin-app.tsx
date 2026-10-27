@@ -38,6 +38,7 @@ import TestimonialsSection from "./sections/testimonials";
 import TransformationsSection from "./sections/transformations";
 import FaqSection from "./sections/faq";
 import ContentSection from "./sections/content";
+import ServicesSection from "./sections/services";
 import ConsultationsSection from "./sections/consultations";
 import PaymentsSection from "./sections/payments";
 import AnalyticsSection from "./sections/analytics";
@@ -60,6 +61,7 @@ function useNav(): NavItem[] {
     { id: "transformations", label: t("admin.transformations"), icon: Sparkles },
     { id: "faq", label: t("admin.faq").length > 0 ? t("admin.faq") : "FAQ", icon: HelpCircle },
     { id: "content", label: t("admin.content"), icon: FileText },
+    { id: "services", label: t("nav.services"), icon: Sparkles },
     { id: "consultations", label: t("admin.consultations"), icon: CalendarCheck },
     { id: "payments", label: t("admin.payments"), icon: CreditCard },
     { id: "analytics", label: t("admin.analytics"), icon: BarChart3 },
@@ -305,6 +307,8 @@ function renderSection(section: AdminSection) {
       return <FaqSection />;
     case "content":
       return <ContentSection />;
+    case "services":
+      return <ServicesSection />;
     case "consultations":
       return <ConsultationsSection />;
     case "payments":

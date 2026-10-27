@@ -10,6 +10,7 @@ export type AdminSection =
   | "transformations"
   | "faq"
   | "content"
+  | "services"
   | "consultations"
   | "payments"
   | "analytics";

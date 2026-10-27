@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { requireCoach, toJSON, parseJSON } from "@/lib/server-utils";
+import { randomUUID } from "node:crypto";
 
 const schema = z.object({
   title: z.string().min(2),
@@ -38,7 +39,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: parsed.error.issues[0]?.message ?? "Invalid" }, { status: 400 });
   }
   const d = parsed.data;
-  const slug = d.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+  const baseSlug = d.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "service";
+  const slug = `${baseSlug}-${randomUUID().slice(0, 8)}`;
   const created = await db.service.create({
     data: { ...d, slug, features: toJSON(d.features) },
   });

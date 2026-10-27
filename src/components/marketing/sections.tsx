@@ -165,12 +165,12 @@ export function MeetCoach({ content }: { content: any }) {
             </div>
 
             <div className="mt-7 flex flex-wrap gap-3">
-              <a href={wa} target="_blank" rel="noreferrer">
-                <Button className="bg-primary text-primary-foreground hover:bg-primary/90">
+              <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+                <a href={wa} target="_blank" rel="noreferrer">
                   <MessageCircle className="mr-2 h-4 w-4" />
                   {t("coach.contactWhatsapp")}
-                </Button>
-              </a>
+                </a>
+              </Button>
               <Button asChild variant="outline" className="border-border/60">
                 <a href="#packages">
                   {t("cta.explore")}
@@ -486,12 +486,12 @@ export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsa
                         {t("cta.start")}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
-                      <a href={wa} target="_blank" rel="noreferrer" className="inline-flex">
-                        <Button variant="ghost" size="sm" className="w-full text-foreground/70 hover:text-primary">
+                      <Button asChild variant="ghost" size="sm" className="w-full text-foreground/70 hover:text-primary">
+                        <a href={wa} target="_blank" rel="noreferrer">
                           <MessageCircle className="mr-2 h-4 w-4 text-[#25D366]" />
                           {t("actions.inquire")}
-                        </Button>
-                      </a>
+                        </a>
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -645,12 +645,12 @@ export function FinalCTA({ content }: { content: any }) {
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
           {content?.whatsappEnabled !== false && (
-            <a href={wa} target="_blank" rel="noreferrer">
-              <Button size="lg" variant="outline" className="border-border/60">
+            <Button asChild size="lg" variant="outline" className="border-border/60">
+              <a href={wa} target="_blank" rel="noreferrer">
                 <MessageCircle className="mr-2 h-5 w-5 text-[#25D366]" />
                 {t("cta.contact")}
-              </Button>
-            </a>
+              </a>
+            </Button>
           )}
         </motion.div>
       </div>
