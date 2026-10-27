@@ -66,6 +66,8 @@ const fadeUp = {
 export function MeetCoach({ content }: { content: any }) {
   const { t, locale } = useI18n();
   const wa = buildWhatsappLink(content.whatsappNumber, t("coach.contactWhatsapp"));
+  const illustrativePortrait = ["/images/service-coaching.jpg", "/images/coach-portrait.jpg"].includes(content.coachPortrait);
+  const portrait = illustrativePortrait ? "/images/gym-bg.jpg" : content.coachPortrait;
 
   const specs = [
     { icon: Dumbbell, label: locale === "fr" ? "Hypertrophie & Force" : locale === "ar" ? "الضخامة والقوة" : "Hypertrophy & Strength" },
@@ -91,11 +93,12 @@ export function MeetCoach({ content }: { content: any }) {
           >
             <div className="absolute -inset-4 -z-10 rounded-3xl bg-primary/10 blur-2xl" />
             <div className="overflow-hidden rounded-2xl border border-border/50 bg-card">
-              {content.coachPortrait ? (
+              {portrait ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={content.coachPortrait}
-                  alt="Personal training and strength coaching"
+                  src={portrait}
+                  alt={illustrativePortrait ? "Strength training space" : content.coachName}
+                  loading="lazy"
                   className="aspect-[3/4] w-full object-cover"
                 />
               ) : (
