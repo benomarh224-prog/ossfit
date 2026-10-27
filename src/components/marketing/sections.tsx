@@ -392,12 +392,15 @@ export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsa
     window.dispatchEvent(event);
   });
 
-  if (!packages?.length) return null;
-
   return (
-    <section id="packages" className="border-y border-border/40 bg-card/30 py-20 sm:py-28">
+    <section id="packages" className="scroll-mt-20 border-y border-border/40 bg-card/30 py-20 sm:py-28">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.packagesTag")} title={t("sections.packages")} />
+        {packages.length === 0 && (
+          <p role="status" className="mt-10 text-center text-muted-foreground">
+            {t("sections.packagesEmpty")}
+          </p>
+        )}
         <div className="mt-14 grid gap-6 lg:grid-cols-3">
           {packages.map((p, i) => {
             const featured = p.featured;

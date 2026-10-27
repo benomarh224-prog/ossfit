@@ -121,6 +121,8 @@ src/lib/i18n/               # trilingual dictionary + provider + formatMAD
 - For a real Morocco payment gateway, integrate CMI (or another eligible
   provider) and replace the manual-transfer flow once tested.
 - The build runs `prisma migrate deploy`; seed or import real content separately.
+- The pricing migration adds the original 399 / 699 / 1199 MAD monthly tiers
+  only when the packages table is empty. Existing packages are preserved.
 - The site is dark-first; ensure the reverse proxy passes the `Accept-Language`
   and WebSocket headers (not required for the marketing site).
 
