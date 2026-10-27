@@ -1,14 +1,13 @@
 // Prisma schema for the premium online personal trainer platform.
-// SQLite is used as the local database (project constraint). All list-like
-// fields are stored as JSON-encoded strings because SQLite does not support
-// native arrays or enums.
+// PostgreSQL is used in production. List-like fields remain JSON-encoded
+// strings for compatibility with the existing application code.
 
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
-import { parseJSON } from "@/lib/server-utils";
+import { getSiteContent, parseJSON } from "@/lib/server-utils";
 import { LandingPage } from "@/components/marketing/landing-page";
 import { ClientApp } from "@/components/dashboard/client-app";
 import { AdminApp } from "@/components/admin/admin-app";
@@ -10,7 +10,7 @@ import { AdminApp } from "@/components/admin/admin-app";
 async function getPublicSiteData() {
   const [content, services, packages, testimonials, transformations, faqs] =
     await Promise.all([
-      db.siteContent.findUnique({ where: { id: "singleton" } }).then((c) => c ?? null),
+      getSiteContent(),
       db.service.findMany({ where: { published: true }, orderBy: { order: "asc" } }),
       db.package.findMany({ where: { available: true }, orderBy: { order: "asc" } }),
       db.testimonial.findMany({ where: { published: true }, orderBy: { order: "asc" } }),
@@ -19,18 +19,16 @@ async function getPublicSiteData() {
     ]);
 
   return {
-    content: content
-      ? {
-          ...content,
-          heroStats: {
-            clients: content.heroStatClients,
-            programs: content.heroStatPrograms,
-            years: content.heroStatYears,
-            success: content.heroStatSuccess,
-            verified: content.statsVerified,
-          },
-        }
-      : null,
+    content: {
+      ...content,
+      heroStats: {
+        clients: content.heroStatClients,
+        programs: content.heroStatPrograms,
+        years: content.heroStatYears,
+        success: content.heroStatSuccess,
+        verified: content.statsVerified,
+      },
+    },
     services: services.map((s) => ({ ...s, features: parseJSON<string[]>(s.features, []) })),
     packages: packages.map((p) => ({ ...p, features: parseJSON<string[]>(p.features, []) })),
     testimonials,

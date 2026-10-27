@@ -63,9 +63,9 @@ export async function requireAuth() {
 
 // Singleton site content record (created on first access)
 export async function getSiteContent() {
-  let content = await db.siteContent.findUnique({ where: { id: "singleton" } });
-  if (!content) {
-    content = await db.siteContent.create({ data: { id: "singleton" } });
-  }
-  return content;
+  return db.siteContent.upsert({
+    where: { id: "singleton" },
+    create: { id: "singleton" },
+    update: {},
+  });
 }

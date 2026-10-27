@@ -2,7 +2,7 @@
 
 Premium online personal training platform for a coach in **Tetouan, Morocco**,
 serving clients across all of Morocco. Built with Next.js 16 (App Router),
-TypeScript, Tailwind CSS 4, shadcn/ui, Framer Motion, Prisma (SQLite),
+TypeScript, Tailwind CSS 4, shadcn/ui, Framer Motion, Prisma (PostgreSQL),
 NextAuth, Recharts, and a trilingual i18n system (English / French / Arabic
 with full RTL support).
 
@@ -35,7 +35,7 @@ with full RTL support).
 - Next.js 16 (App Router) + TypeScript 5
 - Tailwind CSS 4 + shadcn/ui (New York) + Lucide icons
 - Framer Motion (animations), Recharts (charts)
-- Prisma ORM (SQLite), NextAuth.js v4 (credentials, JWT, roles)
+- Prisma ORM (PostgreSQL), NextAuth.js v4 (credentials, JWT, roles)
 - Zustand (client state), TanStack Query (server state), react-hook-form + zod
 - next-themes (dark-first premium theme)
 
@@ -47,12 +47,13 @@ bun install            # or: npm install / pnpm install
 
 # 2. Copy env and set secrets
 cp .env.example .env
+#   - set DATABASE_URL to your PostgreSQL connection string
 #   - set NEXTAUTH_SECRET to a long random string
 #   - set COACH_SEED_PASSWORD and DEMO_CLIENT_SEED_PASSWORD to unique values
 #   - optionally set COACH_SEED_EMAIL (your coach login)
 
-# 3. Create the SQLite database and push the schema
-bun run db:push
+# 3. Apply the PostgreSQL migration
+bun run db:migrate
 
 # 4. Seed demo content (coach + demo client + services/packages/FAQ/etc.)
 bun run scripts/seed.ts
@@ -86,8 +87,8 @@ passwords and does not print them.
 - **API:** everything else is an API route under `src/app/api/` with zod
   validation and role guards (`requireCoach` / `requireClient` / `requireAuth`
   in `src/lib/server-utils.ts`).
-- **List fields** in the Prisma schema are JSON-encoded strings (SQLite does
-  not support native arrays/enums); helpers `parseJSON`/`toJSON` handle them.
+- **List fields** in the Prisma schema are JSON-encoded strings; helpers
+  `parseJSON`/`toJSON` handle them.
 - **Uploads** are stored locally in `public/uploads/` via `POST /api/upload`
   (image-only, validated, max 6 MB). Swap for Cloudinary/S3 in production.
 - **Payments** are manual bank-transfer with proof verification. The system is
@@ -115,10 +116,11 @@ src/lib/i18n/               # trilingual dictionary + provider + formatMAD
 
 ## Deployment
 
-- Set the env vars (production `NEXTAUTH_SECRET`, `NEXTAUTH_URL`, DB path).
+- Set production `NEXTAUTH_SECRET` and `NEXTAUTH_URL`; connect a PostgreSQL
+  database so Vercel provides `DATABASE_URL`.
 - For a real Morocco payment gateway, integrate CMI (or another eligible
   provider) and replace the manual-transfer flow once tested.
-- Run `prisma db push` on deploy, then seed or import real content.
+- The build runs `prisma migrate deploy`; seed or import real content separately.
 - The site is dark-first; ensure the reverse proxy passes the `Accept-Language`
   and WebSocket headers (not required for the marketing site).
 
