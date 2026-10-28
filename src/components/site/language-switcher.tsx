@@ -21,7 +21,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
         <Button
           variant="ghost"
           size={compact ? "icon" : "sm"}
-          className="gap-2 text-foreground/80 hover:text-primary"
+          className={`${compact ? "size-11 sm:size-9" : ""} gap-2 text-foreground/80 hover:text-primary`}
           aria-label={t("nav.language") || "Language"}
         >
           <Languages className="h-4 w-4" />

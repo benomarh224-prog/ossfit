@@ -35,7 +35,7 @@ function SectionHeading({
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-80px" }}
+      viewport={{ once: true, margin: "-24px" }}
       transition={{ duration: 0.6 }}
       className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}
     >
@@ -45,7 +45,7 @@ function SectionHeading({
           {eyebrow}
         </span>
       )}
-      <h2 className="mt-4 font-display text-3xl font-bold uppercase tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+      <h2 className="mt-3 text-balance font-display text-[1.75rem] font-bold uppercase leading-tight tracking-tight text-foreground sm:mt-4 sm:text-4xl lg:text-5xl">
         {title}
       </h2>
       {tag && <p className="mt-3 text-base text-muted-foreground sm:text-lg">{tag}</p>}
@@ -77,19 +77,19 @@ export function MeetCoach({ content }: { content: any }) {
   ];
 
   return (
-    <section id="about" className="relative py-20 sm:py-28">
+    <section id="about" className="relative py-10 sm:py-14 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow={t("sections.meetCoachTag")}
           title={t("sections.meetCoach")}
         />
-        <div className="mt-14 grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+        <div className="mt-7 grid items-center gap-7 sm:mt-10 lg:mt-14 lg:grid-cols-2 lg:gap-16">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="relative mx-auto max-w-sm"
+            className="relative mx-auto w-full max-w-sm"
           >
             <div className="absolute -inset-4 -z-10 rounded-3xl bg-primary/10 blur-2xl" />
             <div className="overflow-hidden rounded-2xl border border-border/50 bg-card">
@@ -99,10 +99,10 @@ export function MeetCoach({ content }: { content: any }) {
                   src={portrait}
                   alt={illustrativePortrait ? "Strength training space" : content.coachName}
                   loading="lazy"
-                  className="aspect-[3/4] w-full object-cover"
+                  className="aspect-[4/3] w-full object-cover object-top sm:aspect-[3/4]"
                 />
               ) : (
-                <div className="aspect-[3/4] w-full bg-gradient-to-br from-primary/20 to-card" />
+                <div className="aspect-[4/3] w-full bg-gradient-to-br from-primary/20 to-card sm:aspect-[3/4]" />
               )}
             </div>
             <Badge className="absolute -bottom-3 left-1/2 -translate-x-1/2 border border-primary/30 bg-card px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-primary shadow-lg">
@@ -158,7 +158,7 @@ export function MeetCoach({ content }: { content: any }) {
                     viewport={{ once: true }}
                     className="flex items-center gap-3 rounded-lg border border-border/50 bg-card/60 p-3"
                   >
-                    <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary/15 text-primary">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/15 text-primary">
                       <s.icon className="h-4 w-4" />
                     </span>
                     <span className="text-xs font-medium text-foreground/80">{s.label}</span>
@@ -167,14 +167,14 @@ export function MeetCoach({ content }: { content: any }) {
               </div>
             </div>
 
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90">
+            <div className="mt-6 flex flex-col gap-2.5 sm:flex-row sm:flex-wrap">
+              <Button asChild className="min-h-11 whitespace-normal bg-primary py-3 text-primary-foreground hover:bg-primary/90">
                 <a href={wa} target="_blank" rel="noreferrer">
                   <MessageCircle className="mr-2 h-4 w-4" />
                   {t("coach.contactWhatsapp")}
                 </a>
               </Button>
-              <Button asChild variant="outline" className="border-border/60">
+              <Button asChild variant="outline" className="min-h-11 whitespace-normal border-border/60 py-3">
                 <a href="#packages">
                   {t("cta.explore")}
                   <ArrowRight className="ml-2 h-4 w-4" />
@@ -221,11 +221,11 @@ export function WhyChoose() {
     return text ? { ...reason, title: text[0], desc: text[1] } : reason;
   });
   return (
-    <section className="relative border-y border-border/40 bg-card/30 py-20 sm:py-28">
+    <section className="relative border-y border-border/40 bg-card/30 py-10 sm:py-14 lg:py-20">
       <div className="bg-grid absolute inset-0 opacity-40" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.whyChooseTag")} title={t("sections.whyChoose")} />
-        <div className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-7 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-5 lg:mt-14 lg:grid-cols-3">
           {reasons.map((r, i) => (
             <motion.div
               key={i}
@@ -233,17 +233,17 @@ export function WhyChoose() {
               variants={fadeUp}
               initial="hidden"
               whileInView="show"
-              viewport={{ once: true, margin: "-60px" }}
+              viewport={{ once: true, margin: "-24px" }}
             >
-              <Card className="group h-full border-border/50 bg-card/60 transition-all hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5">
-                <CardHeader className="flex flex-row items-center gap-3 pb-3">
-                  <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/15 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+              <Card className="group h-full gap-0 border-border/50 bg-card/60 py-0 transition-all hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5">
+                <CardContent className="flex gap-3 p-4 sm:flex-col sm:gap-4 sm:p-5">
+                  <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-primary/15 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                     <r.icon className="h-5 w-5" />
                   </span>
-                </CardHeader>
-                <CardContent>
-                  <h3 className="font-display text-lg font-bold uppercase tracking-tight">{r.title}</h3>
-                  <p className="mt-2 text-sm text-muted-foreground">{r.desc}</p>
+                  <div className="min-w-0">
+                    <h3 className="font-display text-base font-bold uppercase tracking-tight sm:text-lg">{r.title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{r.desc}</p>
+                  </div>
                 </CardContent>
               </Card>
             </motion.div>
@@ -259,10 +259,10 @@ export function Services({ services }: { services: any[] }) {
   const { t } = useI18n();
   const icons: Record<string, any> = { dumbbell: Dumbbell, flame: Flame, salad: Salad, video: Video };
   return (
-    <section id="services" className="py-20 sm:py-28">
+    <section id="services" className="py-10 sm:py-14 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.servicesTag")} title={t("sections.services")} />
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mt-7 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-5 lg:mt-14 lg:grid-cols-4">
           {services.map((s, i) => {
             const Icon = icons[s.icon] ?? Dumbbell;
             return (
@@ -272,25 +272,25 @@ export function Services({ services }: { services: any[] }) {
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="show"
-                viewport={{ once: true, margin: "-60px" }}
+                viewport={{ once: true, margin: "-24px" }}
               >
-                <Card className="group h-full overflow-hidden border-border/50 bg-card/60">
-                  <div className="relative aspect-[4/3] overflow-hidden">
+                <Card className="group grid h-full grid-cols-[4.5rem_1fr] gap-3 overflow-hidden border-border/50 bg-card/60 p-3 sm:flex sm:flex-col sm:gap-0 sm:p-0">
+                  <div className="relative h-24 overflow-hidden rounded-lg sm:aspect-[4/3] sm:h-auto sm:rounded-none">
                     {s.image ? (
                       // eslint-disable-next-line @next/next/no-img-element
-                      <img src={s.image} alt={s.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                      <img src={s.image} alt={s.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     ) : (
                       <div className="h-full w-full bg-gradient-to-br from-primary/20 to-card" />
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-card via-card/30 to-transparent" />
-                    <span className="absolute left-4 top-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg">
+                    <span className="absolute bottom-2 start-2 flex size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-lg sm:bottom-auto sm:start-4 sm:top-4 sm:size-10">
                       <Icon className="h-5 w-5" />
                     </span>
                   </div>
-                  <CardContent className="p-5">
-                    <h3 className="font-display text-lg font-bold uppercase tracking-tight">{s.title}</h3>
-                    <p className="mt-2 text-sm text-muted-foreground">{s.shortDesc}</p>
-                    <ul className="mt-4 space-y-1.5">
+                  <CardContent className="min-w-0 p-0 sm:p-5">
+                    <h3 className="font-display text-base font-bold uppercase tracking-tight sm:text-lg">{s.title}</h3>
+                    <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{s.shortDesc}</p>
+                    <ul className="mt-3 space-y-1.5">
                       {s.features?.slice(0, 3).map((f: string, idx: number) => (
                         <li key={idx} className="flex items-start gap-2 text-xs text-foreground/70">
                           <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0 text-primary" />
@@ -326,12 +326,12 @@ export function HowItWorks() {
     return text ? { ...step, title: text[0], desc: text[1] } : step;
   });
   return (
-    <section id="how" className="border-y border-border/40 bg-card/30 py-20 sm:py-28">
+    <section id="how" className="border-y border-border/40 bg-card/30 py-10 sm:py-14 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.howItWorksTag")} title={t("sections.howItWorks")} />
-        <div className="relative mt-14">
+        <div className="relative mt-7 sm:mt-10 lg:mt-14">
           <div className="absolute left-0 top-12 hidden h-px w-full bg-gradient-to-r from-primary/40 via-primary/20 to-transparent lg:block" />
-          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4">
             {steps.map((s, i) => (
               <motion.div
                 key={i}
@@ -340,11 +340,11 @@ export function HowItWorks() {
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true }}
-                className="relative"
+                className="relative grid grid-cols-[2.75rem_1fr] gap-x-3 sm:block"
               >
-                <div className="font-display text-5xl font-bold text-primary/20">{s.n}</div>
-                <h3 className="mt-2 font-display text-lg font-bold uppercase tracking-tight">{s.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{s.desc}</p>
+                <div className="row-span-2 font-display text-3xl font-bold text-primary/50 sm:text-5xl sm:text-primary/20">{s.n}</div>
+                <h3 className="font-display text-lg font-bold uppercase tracking-tight sm:mt-2">{s.title}</h3>
+                <p className="mt-1 text-sm leading-relaxed text-muted-foreground sm:mt-2">{s.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -359,10 +359,10 @@ export function Transformations({ transformations }: { transformations: any[] })
   const { t, locale } = useI18n();
   if (!transformations?.length) return null;
   return (
-    <section id="results" className="py-20 sm:py-28">
+    <section id="results" className="py-10 sm:py-14 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.galleryTag")} title={t("sections.gallery")} />
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-7 sm:mt-10 lg:mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {transformations.map((tr, i) => (
             <motion.div
               key={tr.id}
@@ -370,9 +370,9 @@ export function Transformations({ transformations }: { transformations: any[] })
               variants={fadeUp}
               initial="hidden"
               whileInView="show"
-              viewport={{ once: true, margin: "-60px" }}
+              viewport={{ once: true, margin: "-24px" }}
             >
-              <Card className="group overflow-hidden border-border/50 bg-card/60">
+              <Card className="group gap-0 overflow-hidden border-border/50 bg-card/60 py-0">
                 <div className="grid grid-cols-2">
                   <div className="relative aspect-[3/4] overflow-hidden">
                     {tr.beforeImg ? (
@@ -424,7 +424,7 @@ export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsa
   };
 
   return (
-    <section id="packages" className="scroll-mt-20 border-y border-border/40 bg-card/30 py-20 sm:py-28">
+    <section id="packages" className="scroll-mt-20 border-y border-border/40 bg-card/30 py-10 sm:py-14 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.packagesTag")} title={t("sections.packages")} />
         {packages.length === 0 && (
@@ -432,7 +432,7 @@ export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsa
             {t("sections.packagesEmpty")}
           </p>
         )}
-        <div className="mt-14 grid gap-6 lg:grid-cols-3">
+        <div className="mt-7 grid gap-4 sm:mt-10 sm:gap-6 lg:mt-14 lg:grid-cols-3">
           {packages.map((p, i) => {
             const featured = p.featured;
             const waMsg = `Hello! I'm interested in the "${p.title}" package (${p.priceMAD} MAD). Can you share the next steps?`;
@@ -444,25 +444,23 @@ export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsa
                 variants={fadeUp}
                 initial="hidden"
                 whileInView="show"
-                viewport={{ once: true, margin: "-60px" }}
+                viewport={{ once: true, margin: "-24px" }}
                 className={featured ? "lg:-mt-4 lg:mb-4" : ""}
               >
                 <Card
-                  className={`relative flex h-full flex-col overflow-hidden border ${
+                  className={`relative flex h-full flex-col gap-4 overflow-hidden border py-5 sm:py-6 ${
                     featured ? "border-primary bg-card shadow-2xl shadow-primary/10" : "border-border/50 bg-card/60"
                   }`}
                 >
-                  {featured && (
-                    <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground">
-                      <Star className="h-3 w-3" /> {t("common.featured")}
-                    </span>
-                  )}
-                  <CardHeader className="pb-2">
-                    <h3 className="font-display text-xl font-bold uppercase tracking-tight">{p.title}</h3>
+                  <CardHeader className="px-5 pb-0 sm:px-6">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <h3 className="font-display text-xl font-bold uppercase tracking-tight">{p.title}</h3>
+                      {featured && <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground"><Star className="h-3 w-3" />{t("common.featured")}</span>}
+                    </div>
                     <p className="text-sm text-muted-foreground">{p.tagline}</p>
                   </CardHeader>
-                  <CardContent className="flex flex-1 flex-col">
-                    <div className="flex items-baseline gap-1">
+                  <CardContent className="flex flex-1 flex-col px-5 sm:px-6">
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
                       <span className="font-display text-4xl font-bold text-primary">
                         {formatMAD(p.priceMAD, locale)}
                       </span>
@@ -483,13 +481,13 @@ export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsa
                     <div className="mt-auto flex flex-col gap-2 pt-6">
                       <Button
                         onClick={() => authTrigger(p.id)}
-                        className={featured ? "w-full bg-primary text-primary-foreground hover:bg-primary/90" : "w-full"}
+                        className={`min-h-11 w-full whitespace-normal py-3 ${featured ? "bg-primary text-primary-foreground hover:bg-primary/90" : ""}`}
                         variant={featured ? "default" : "outline"}
                       >
                         {t("cta.start")}
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </Button>
-                      <Button asChild variant="ghost" size="sm" className="w-full text-foreground/70 hover:text-primary">
+                      <Button asChild variant="ghost" size="sm" className="min-h-11 w-full whitespace-normal py-3 text-foreground/70 hover:text-primary">
                         <a href={wa} target="_blank" rel="noreferrer">
                           <MessageCircle className="mr-2 h-4 w-4 text-[#25D366]" />
                           {t("actions.inquire")}
@@ -519,10 +517,10 @@ export function Testimonials({ testimonials }: { testimonials: any[] }) {
   const { t } = useI18n();
   if (!testimonials?.length) return null;
   return (
-    <section id="testimonials" className="py-20 sm:py-28">
+    <section id="testimonials" className="py-10 sm:py-14 lg:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.testimonialsTag")} title={t("sections.testimonials")} />
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-7 sm:mt-10 lg:mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((tm, i) => (
             <motion.div
               key={tm.id}
@@ -530,10 +528,10 @@ export function Testimonials({ testimonials }: { testimonials: any[] }) {
               variants={fadeUp}
               initial="hidden"
               whileInView="show"
-              viewport={{ once: true, margin: "-60px" }}
+              viewport={{ once: true, margin: "-24px" }}
             >
-              <Card className="h-full border-border/50 bg-card/60">
-                <CardContent className="flex h-full flex-col p-6">
+              <Card className="h-full gap-0 border-border/50 bg-card/60 py-0">
+                <CardContent className="flex h-full flex-col p-5 sm:p-6">
                   <div className="flex items-center gap-1">
                     {Array.from({ length: tm.rating ?? 5 }).map((_, idx) => (
                       <Star key={idx} className="h-4 w-4 fill-primary text-primary" />
@@ -577,10 +575,10 @@ export function FAQ({ faqs }: { faqs: any[] }) {
   const { t } = useI18n();
   if (!faqs?.length) return null;
   return (
-    <section id="faq" className="border-y border-border/40 bg-card/30 py-20 sm:py-28">
+    <section id="faq" className="border-y border-border/40 bg-card/30 py-10 sm:py-14 lg:py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.faqTag")} title={t("sections.faq")} />
-        <Accordion type="single" collapsible className="mt-10 w-full">
+        <Accordion type="single" collapsible className="mt-7 w-full sm:mt-10">
           {faqs.map((f, i) => (
             <motion.div
               key={f.id}
@@ -590,7 +588,7 @@ export function FAQ({ faqs }: { faqs: any[] }) {
               transition={{ duration: 0.4, delay: i * 0.04 }}
             >
               <AccordionItem value={f.id} className="border-border/50">
-                <AccordionTrigger className="text-left font-display text-base font-bold uppercase tracking-tight hover:text-primary">
+                <AccordionTrigger className="min-h-12 text-start font-display text-base font-bold uppercase tracking-tight hover:text-primary">
                   {f.question}
                 </AccordionTrigger>
                 <AccordionContent className="text-sm text-muted-foreground">
@@ -614,7 +612,7 @@ export function FinalCTA({ content }: { content: any }) {
   });
 
   return (
-    <section className="relative overflow-hidden py-24">
+    <section className="relative overflow-hidden py-12 sm:py-16 lg:py-20">
       <div className="absolute inset-0 -z-10 bg-gradient-to-br from-primary/15 via-background to-background" />
       <div className="absolute inset-0 -z-10 bg-grid opacity-30" />
       <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
@@ -641,14 +639,14 @@ export function FinalCTA({ content }: { content: any }) {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row"
+          className="mt-6 flex flex-col items-stretch justify-center gap-2.5 sm:mt-8 sm:flex-row sm:items-center sm:gap-3"
         >
-          <Button size="lg" onClick={trigger} className="bg-primary text-primary-foreground hover:bg-primary/90">
+          <Button size="lg" onClick={trigger} className="min-h-12 whitespace-normal bg-primary px-4 py-3 text-primary-foreground hover:bg-primary/90">
             {t("hero.primaryCta")}
             <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
           {content?.whatsappEnabled !== false && (
-            <Button asChild size="lg" variant="outline" className="border-border/60">
+            <Button asChild size="lg" variant="outline" className="min-h-12 whitespace-normal border-border/60 px-4 py-3">
               <a href={wa} target="_blank" rel="noreferrer">
                 <MessageCircle className="mr-2 h-5 w-5 text-[#25D366]" />
                 {t("cta.contact")}

@@ -52,7 +52,7 @@ export function Hero({ content }: { content: Content }) {
     : null;
 
   return (
-    <section id="top" className="relative isolate flex min-h-[100svh] items-center overflow-hidden pt-16">
+    <section id="top" className="relative isolate flex items-center overflow-hidden pb-10 pt-24 sm:pb-16 sm:pt-28 lg:min-h-[85svh] lg:pb-24 lg:pt-32">
       {/* Background image with overlay */}
       <div className="absolute inset-0 -z-10">
         {content.heroImage ? (
@@ -60,7 +60,7 @@ export function Hero({ content }: { content: Content }) {
           <img
             src={content.heroImage}
             alt="Coach Oussama — online personal trainer"
-            className="h-full w-full object-cover object-center"
+            className="h-full w-full object-cover object-center opacity-45 dark:opacity-60 lg:opacity-100"
           />
         ) : null}
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/60 dark:via-background/85 dark:to-background/30" />
@@ -76,40 +76,40 @@ export function Hero({ content }: { content: Content }) {
           className="max-w-3xl"
         >
           <motion.div variants={item}>
-            <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+            <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-wider text-primary sm:text-xs">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
               {locale === "ar" ? "أسامة · تدريب شخصي عبر الإنترنت" : locale === "fr" ? "Oussama · Coaching personnel en ligne" : "Oussama · Personal coaching, online"}
             </span>
           </motion.div>
 
           <motion.h1
             variants={item}
-            className="mt-5 font-display text-4xl font-bold uppercase leading-[0.95] tracking-tight text-foreground sm:text-6xl lg:text-7xl"
+            className="mt-4 text-balance font-display text-4xl font-bold uppercase leading-[1.05] tracking-tight text-foreground sm:mt-5 sm:text-6xl lg:text-7xl"
           >
             {content.heroTitle}
           </motion.h1>
 
           <motion.p
             variants={item}
-            className="mt-6 max-w-xl text-base text-foreground/70 sm:text-lg"
+            className="mt-4 max-w-xl text-[15px] leading-relaxed text-foreground/70 sm:mt-6 sm:text-lg"
           >
             {content.heroSubtitle}
           </motion.p>
 
-          <motion.div variants={item} className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
-            <Button asChild size="lg" className="group w-full bg-primary text-primary-foreground hover:bg-primary/90 sm:w-auto">
+          <motion.div variants={item} className="mt-6 flex flex-col gap-2.5 sm:mt-8 sm:flex-row sm:flex-wrap sm:items-center">
+            <Button asChild size="lg" className="group min-h-12 w-full whitespace-normal bg-primary px-4 py-3 text-primary-foreground hover:bg-primary/90 sm:w-auto">
               <a href="#packages">
                 {t("hero.primaryCta")}
                 <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
               </a>
             </Button>
-            <Button asChild size="lg" variant="outline" className="w-full border-border/60 bg-background/40 backdrop-blur-sm hover:bg-accent sm:w-auto">
+            <Button asChild size="lg" variant="outline" className="min-h-12 w-full whitespace-normal border-border/60 bg-background/60 px-4 py-3 backdrop-blur-sm hover:bg-accent sm:w-auto">
               <a href="#packages">
                 {t("hero.secondaryCta")}
               </a>
             </Button>
             {content.whatsappEnabled !== false && (
-              <Button asChild size="lg" variant="ghost" className="w-full text-foreground/80 hover:text-primary sm:w-auto">
+              <Button asChild size="lg" variant="ghost" className="min-h-11 w-full whitespace-normal px-4 py-3 text-foreground/80 hover:text-primary sm:w-auto">
                 <a href={wa} target="_blank" rel="noreferrer">
                   <MessageCircle className="mr-2 h-5 w-5 text-[#25D366]" />
                   {t("hero.whatsapp")}
@@ -121,7 +121,7 @@ export function Hero({ content }: { content: Content }) {
           {statItems && (
             <motion.dl
               variants={item}
-              className="mt-12 grid grid-cols-2 gap-6 sm:grid-cols-4"
+              className="mt-8 grid grid-cols-2 gap-4 sm:mt-12 sm:grid-cols-4 sm:gap-6"
             >
               {statItems.map((s, i) => (
                 <div key={i} className="border-l-2 border-primary/50 pl-4">

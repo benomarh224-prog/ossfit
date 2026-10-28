@@ -26,8 +26,8 @@ export function SiteFooter({ content, showResults = false }: { content: SiteCont
   return (
     <footer className="mt-auto border-t border-border/50 bg-card/40">
       <div className="bg-grid">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
-          <div className="md:col-span-2 lg:col-span-1">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-5 gap-y-7 px-4 py-8 sm:gap-8 sm:px-6 sm:py-12 lg:grid-cols-4 lg:px-8">
+          <div className="col-span-2 lg:col-span-1">
             <Link href="#top" className="flex items-center gap-2">
               <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <Dumbbell className="h-5 w-5" />
@@ -41,17 +41,17 @@ export function SiteFooter({ content, showResults = false }: { content: SiteCont
             </p>
             <div className="mt-5 flex items-center gap-3">
               {content?.instagramUrl && (
-                <a href={content.instagramUrl} target="_blank" rel="noreferrer" className="text-muted-foreground transition-colors hover:text-primary" aria-label="Instagram">
+                <a href={content.instagramUrl} target="_blank" rel="noreferrer" className="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-primary" aria-label="Instagram">
                   <Instagram className="h-5 w-5" />
                 </a>
               )}
               {content?.facebookUrl && (
-                <a href={content.facebookUrl} target="_blank" rel="noreferrer" className="text-muted-foreground transition-colors hover:text-primary" aria-label="Facebook">
+                <a href={content.facebookUrl} target="_blank" rel="noreferrer" className="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-primary" aria-label="Facebook">
                   <Facebook className="h-5 w-5" />
                 </a>
               )}
               {content?.youtubeUrl && (
-                <a href={content.youtubeUrl} target="_blank" rel="noreferrer" className="text-muted-foreground transition-colors hover:text-primary" aria-label="YouTube">
+                <a href={content.youtubeUrl} target="_blank" rel="noreferrer" className="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-primary" aria-label="YouTube">
                   <Youtube className="h-5 w-5" />
                 </a>
               )}
@@ -59,7 +59,7 @@ export function SiteFooter({ content, showResults = false }: { content: SiteCont
                 href={wa}
                 target="_blank"
                 rel="noreferrer"
-                className="text-muted-foreground transition-colors hover:text-primary"
+                className="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
                 aria-label="WhatsApp"
               >
                 <Phone className="h-5 w-5" />
@@ -71,7 +71,7 @@ export function SiteFooter({ content, showResults = false }: { content: SiteCont
             <h3 className="font-display text-sm font-bold uppercase tracking-wider">
               {t("footer.quickLinks")}
             </h3>
-            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+            <ul className="mt-3 text-sm text-muted-foreground [&_a]:flex [&_a]:min-h-11 [&_a]:items-center">
               <li><Link href="#about" className="hover:text-primary">{t("nav.about")}</Link></li>
               <li><Link href="#services" className="hover:text-primary">{t("nav.services")}</Link></li>
               <li><Link href="#packages" className="hover:text-primary">{t("nav.packages")}</Link></li>
@@ -84,7 +84,7 @@ export function SiteFooter({ content, showResults = false }: { content: SiteCont
             <h3 className="font-display text-sm font-bold uppercase tracking-wider">
               {t("footer.services")}
             </h3>
-            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+            <ul className="mt-3 text-sm text-muted-foreground [&_a]:flex [&_a]:min-h-11 [&_a]:items-center">
               <li><Link href="#services" className="hover:text-primary">Online Coaching</Link></li>
               <li><Link href="#services" className="hover:text-primary">Body Transformation</Link></li>
               <li><Link href="#services" className="hover:text-primary">Nutrition Guidance</Link></li>
@@ -92,11 +92,11 @@ export function SiteFooter({ content, showResults = false }: { content: SiteCont
             </ul>
           </div>
 
-          <div>
+          <div className="col-span-2 md:col-span-1">
             <h3 className="font-display text-sm font-bold uppercase tracking-wider">
               {t("footer.legal")}
             </h3>
-            <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+            <ul className="mt-3 text-sm text-muted-foreground [&_a]:flex [&_a]:min-h-11 [&_a]:items-center">
               <li><Link href="/privacy" className="hover:text-primary">{t("footer.privacy")}</Link></li>
               <li><Link href="/terms" className="hover:text-primary">{t("footer.terms")}</Link></li>
             </ul>

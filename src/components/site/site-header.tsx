@@ -105,7 +105,7 @@ export function SiteHeader({ brandName, showResults = false, showTestimonials = 
           })}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-0.5 sm:gap-1.5">
           <ThemeSwitcher />
           <LanguageSwitcher compact />
           <Button
@@ -129,7 +129,7 @@ export function SiteHeader({ brandName, showResults = false, showTestimonials = 
           <div className="xl:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" aria-label="Menu">
+                <Button variant="ghost" size="icon" className="size-11 sm:size-9" aria-label="Menu">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>

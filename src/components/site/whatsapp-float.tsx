@@ -50,10 +50,9 @@ export function WhatsAppFloat({ content }: { content: SiteContent | null }) {
           y: show ? 0 : 20,
         }}
         transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        className="fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/40 ring-4 ring-[#25D366]/20 transition-transform hover:scale-110 sm:bottom-7 sm:right-7"
+        className="fixed bottom-[calc(1rem_+_env(safe-area-inset-bottom))] end-4 z-40 flex size-12 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/25 ring-4 ring-[#25D366]/15 transition-transform hover:scale-105 sm:bottom-7 sm:end-7 sm:size-14"
       >
-        <span className="absolute inset-0 animate-ping rounded-full bg-[#25D366]/40 [animation-duration:2.5s]" />
-        <MessageCircle className="relative h-7 w-7" />
+        <MessageCircle className="size-6 sm:size-7" />
         <span className="sr-only">{t("hero.whatsapp")}</span>
       </motion.a>
     </AnimatePresence>
