@@ -1,6 +1,6 @@
 "use client";
 
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { Check, Monitor, Moon, Sun, SunMoon } from "lucide-react";
@@ -14,10 +14,6 @@ const COPY = {
   ar: { title: "المظهر", hint: "اختار المظهر اللي يريحك.", light: "نهاري", dark: "ليلي", system: "حسب الجهاز", auto: "التبديل بشكل تلقائي" },
 };
 
-const subscribeToHydration = () => () => {};
-const clientSnapshot = () => true;
-const serverSnapshot = () => false;
-
 function ThemePreview({ dark }: { dark: boolean }) {
   return <span aria-hidden="true" className={`relative block h-16 overflow-hidden rounded-lg border p-2 ${dark ? "border-white/10 bg-[#17191d]" : "border-black/10 bg-[#f7f8f5]"}`}>
     <span className={`mb-2 flex h-2 items-center gap-1 border-b pb-2 ${dark ? "border-white/10" : "border-black/10"}`}>
@@ -30,16 +26,17 @@ function ThemePreview({ dark }: { dark: boolean }) {
   </span>;
 }
 
-export function ThemeSwitcher({ minimal = false }: { minimal?: boolean } = {}) {
+export function ThemeSwitcher() {
   const { theme, setTheme } = useTheme();
   const { locale } = useI18n();
   const c = COPY[locale];
-  const mounted = useSyncExternalStore(subscribeToHydration, clientSnapshot, serverSnapshot);
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="icon" className={minimal ? "size-11 shrink-0 rounded-none text-foreground hover:bg-accent" : "size-11 shrink-0 rounded-full border border-border/60 bg-card/70 text-foreground/80 shadow-sm hover:border-primary/40 hover:bg-accent hover:text-primary sm:size-9"} aria-label={c.title} title={c.title} disabled={!mounted}>
+        <Button variant="ghost" size="icon" className="size-11 shrink-0 rounded-full border border-border/60 bg-card/70 text-foreground/80 shadow-sm hover:border-primary/40 hover:bg-accent hover:text-primary sm:size-9" aria-label={c.title} title={c.title} disabled={!mounted}>
           <SunMoon className="h-4 w-4" aria-hidden="true" />
         </Button>
       </PopoverTrigger>

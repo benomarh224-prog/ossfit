@@ -392,7 +392,7 @@ export function localizeSiteContent(content: any, locale: Locale) {
   }
   // Shorter presentation for the original defaults; the coach's own copy is preserved.
   if (content.heroTitle === defaultContent.en.heroTitle) result.heroTitle = {
-    en: "Train with Oussama", fr: "Coach Oussama", ar: "تدرّب مع أسامة",
+    en: "TRAIN WITH PURPOSE.", fr: "VOTRE OBJECTIF. UN VRAI PLAN.", ar: "تدرّب بهدف. تقدّم بثقة.",
   }[locale];
   if (content.heroSubtitle === defaultContent.en.heroSubtitle) result.heroSubtitle = {
     en: "Personal training, practical nutrition and direct support from Coach Oussama. Your program, wherever you train.",

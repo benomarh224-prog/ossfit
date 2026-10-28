@@ -10,9 +10,9 @@ import { Hero } from "./hero";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { localizeMarketing, localizeSiteContent } from "@/lib/marketing-copy";
 import { signedInDestination } from "@/lib/login-access";
-import "./marketing.css";
 import {
   MeetCoach,
+  WhyChoose,
   Services,
   HowItWorks,
   Transformations,
@@ -83,7 +83,7 @@ export function LandingPage({ data, siteUrl }: { data: SiteData; siteUrl: string
   };
 
   return (
-    <div className="marketing-site flex flex-col">
+    <div className="flex min-h-screen flex-col">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonld).replace(/</g, "\\u003c") }}
@@ -91,12 +91,13 @@ export function LandingPage({ data, siteUrl }: { data: SiteData; siteUrl: string
       <SiteHeader brandName={content?.brandName} showResults={data.transformations.length > 0} showTestimonials={data.testimonials.length > 0} />
       <main className="flex-1">
         <Hero content={content} />
-        <Services services={data.services.map((item) => localizeMarketing("services", item.slug, item, locale))} />
         <MeetCoach content={content} />
+        <WhyChoose />
+        <Services services={data.services.map((item) => localizeMarketing("services", item.slug, item, locale))} />
         <HowItWorks />
         <Transformations transformations={data.transformations} />
-        <Testimonials testimonials={data.testimonials} />
         <Packages packages={data.packages.map((item) => localizeMarketing("packages", item.slug, item, locale))} whatsappNumber={content?.whatsappNumber} />
+        <Testimonials testimonials={data.testimonials} />
         <FAQ faqs={data.faqs.map((item) => localizeMarketing("faqs", item.id, item, locale))} />
         <FinalCTA content={content} />
       </main>

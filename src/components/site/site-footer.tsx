@@ -1,27 +1,121 @@
 "use client";
 
 import Link from "next/link";
+import { Dumbbell, Instagram, Facebook, Youtube, MapPin, Phone } from "lucide-react";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { buildWhatsappLink } from "@/lib/client-utils";
-import { marketingCopy } from "@/components/marketing/copy";
 
 type SiteContent = {
-  brandName?: string; coachCity?: string; whatsappNumber?: string; whatsappEnabled?: boolean;
-  instagramUrl?: string | null; tiktokUrl?: string | null; youtubeUrl?: string | null; facebookUrl?: string | null;
+  brandName?: string;
+  coachCity?: string;
+  whatsappNumber?: string;
+  instagramUrl?: string | null;
+  tiktokUrl?: string | null;
+  youtubeUrl?: string | null;
+  facebookUrl?: string | null;
 };
 
 export function SiteFooter({ content, showResults = false }: { content: SiteContent | null; showResults?: boolean }) {
-  const { t, locale } = useI18n(); const c = marketingCopy[locale];
-  const brand = content?.brandName || "Coach Oussama";
-  const social = [{ name: "Instagram", href: content?.instagramUrl }, { name: "Facebook", href: content?.facebookUrl }, { name: "YouTube", href: content?.youtubeUrl }, { name: "TikTok", href: content?.tiktokUrl }].filter(item => item.href);
-  return <footer className="marketing-footer"><div className="marketing-wrap">
-    <Link href="#top" className="marketing-wordmark">{brand}</Link>
-    <div className="marketing-footer-links">
-      <div><p className="max-w-xs text-base leading-relaxed">{t("footer.tagline")}</p>{content?.coachCity && <p className="mt-4 text-base">{content.coachCity}</p>}</div>
-      <div><h3>{t("footer.quickLinks")}</h3><ul><li><Link href="#services">{t("nav.services")}</Link></li><li><Link href="#about">{t("nav.about")}</Link></li><li><Link href="#packages">{t("nav.packages")}</Link></li>{showResults && <li><Link href="#results">{t("nav.results")}</Link></li>}<li><Link href="#faq">{t("nav.faq")}</Link></li></ul></div>
-      <div><h3>{c.contact}</h3><ul>{content?.whatsappEnabled !== false && <li><a href={buildWhatsappLink(content?.whatsappNumber, c.contact)} target="_blank" rel="noreferrer">WhatsApp</a></li>}{social.map(item => <li key={item.name}><a href={item.href!} target="_blank" rel="noreferrer">{item.name}</a></li>)}</ul></div>
-      <div><h3>{t("footer.legal")}</h3><ul><li><Link href="/privacy">{t("footer.privacy")}</Link></li><li><Link href="/terms">{t("footer.terms")}</Link></li></ul></div>
-    </div>
-    <div className="marketing-footer-bottom"><p>© {new Date().getFullYear()} {brand}. {t("footer.rights")}</p><a href="#top" className="marketing-link">{t("nav.home")}</a></div>
-  </div></footer>;
+  const { t } = useI18n();
+
+  const wa = buildWhatsappLink(
+    content?.whatsappNumber,
+    "Hello! I'd like to know more about your coaching programs."
+  );
+
+  return (
+    <footer className="mt-auto border-t border-border/50 bg-card/40">
+      <div className="bg-grid">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-x-5 gap-y-7 px-4 py-8 sm:gap-8 sm:px-6 sm:py-12 lg:grid-cols-4 lg:px-8">
+          <div className="col-span-2 lg:col-span-1">
+            <Link href="#top" className="flex items-center gap-2">
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                <Dumbbell className="h-5 w-5" />
+              </span>
+              <span className="font-display text-lg font-bold uppercase tracking-tight">
+                {content?.brandName || "Coach Oussama"}
+              </span>
+            </Link>
+            <p className="mt-4 max-w-sm text-sm text-muted-foreground">
+              {t("footer.tagline")}
+            </p>
+            <div className="mt-5 flex items-center gap-3">
+              {content?.instagramUrl && (
+                <a href={content.instagramUrl} target="_blank" rel="noreferrer" className="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-primary" aria-label="Instagram">
+                  <Instagram className="h-5 w-5" />
+                </a>
+              )}
+              {content?.facebookUrl && (
+                <a href={content.facebookUrl} target="_blank" rel="noreferrer" className="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-primary" aria-label="Facebook">
+                  <Facebook className="h-5 w-5" />
+                </a>
+              )}
+              {content?.youtubeUrl && (
+                <a href={content.youtubeUrl} target="_blank" rel="noreferrer" className="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-primary" aria-label="YouTube">
+                  <Youtube className="h-5 w-5" />
+                </a>
+              )}
+              <a
+                href={wa}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex size-11 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-accent hover:text-primary"
+                aria-label="WhatsApp"
+              >
+                <Phone className="h-5 w-5" />
+              </a>
+            </div>
+          </div>
+
+          <div>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider">
+              {t("footer.quickLinks")}
+            </h3>
+            <ul className="mt-3 text-sm text-muted-foreground [&_a]:flex [&_a]:min-h-11 [&_a]:items-center">
+              <li><Link href="#about" className="hover:text-primary">{t("nav.about")}</Link></li>
+              <li><Link href="#services" className="hover:text-primary">{t("nav.services")}</Link></li>
+              <li><Link href="#packages" className="hover:text-primary">{t("nav.packages")}</Link></li>
+              {showResults && <li><Link href="#results" className="hover:text-primary">{t("nav.results")}</Link></li>}
+              <li><Link href="#faq" className="hover:text-primary">{t("nav.faq")}</Link></li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider">
+              {t("footer.services")}
+            </h3>
+            <ul className="mt-3 text-sm text-muted-foreground [&_a]:flex [&_a]:min-h-11 [&_a]:items-center">
+              <li><Link href="#services" className="hover:text-primary">Online Coaching</Link></li>
+              <li><Link href="#services" className="hover:text-primary">Body Transformation</Link></li>
+              <li><Link href="#services" className="hover:text-primary">Nutrition Guidance</Link></li>
+              <li><Link href="#services" className="hover:text-primary">1-to-1 Consultation</Link></li>
+            </ul>
+          </div>
+
+          <div className="col-span-2 md:col-span-1">
+            <h3 className="font-display text-sm font-bold uppercase tracking-wider">
+              {t("footer.legal")}
+            </h3>
+            <ul className="mt-3 text-sm text-muted-foreground [&_a]:flex [&_a]:min-h-11 [&_a]:items-center">
+              <li><Link href="/privacy" className="hover:text-primary">{t("footer.privacy")}</Link></li>
+              <li><Link href="/terms" className="hover:text-primary">{t("footer.terms")}</Link></li>
+            </ul>
+            {content?.coachCity && (
+              <p className="mt-6 flex items-center gap-2 text-sm text-muted-foreground">
+                <MapPin className="h-4 w-4 text-primary" />
+                {content.coachCity}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="border-t border-border/50">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-5 text-xs text-muted-foreground sm:flex-row sm:px-6 lg:px-8">
+          <p>© {new Date().getFullYear()} {content?.brandName || "Coach Oussama"}. {t("footer.rights")}</p>
+          <p>{t("footer.madeIn")}</p>
+        </div>
+      </div>
+    </footer>
+  );
 }
