@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { allowRequest, requestIp } from "@/lib/rate-limit";
+import { isSessionCurrent } from "@/lib/account-security";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
@@ -34,6 +35,7 @@ export const authOptions: NextAuthOptions = {
           email: user.email,
           name: user.name ?? undefined,
           role: user.role,
+          sessionVersion: user.sessionVersion,
           onboarded: user.clientProfile?.onboarded ?? false,
         } as any;
       },
@@ -45,19 +47,23 @@ export const authOptions: NextAuthOptions = {
         token.id = (user as any).id;
         token.role = (user as any).role;
         token.onboarded = (user as any).onboarded;
+        token.sessionVersion = (user as any).sessionVersion;
       }
-      // refresh onboarding flag in case it changed after registration
+      // Check revocation before refreshing role and onboarding data.
       if (token.id) {
         const u = await db.user.findUnique({
           where: { id: token.id as string },
           include: { clientProfile: true },
         });
-        if (u) {
+        if (u && isSessionCurrent(token.sessionVersion, u.sessionVersion)) {
           token.role = u.role;
+          token.email = u.email;
           token.onboarded = u.clientProfile?.onboarded ?? false;
         } else {
           token.id = undefined;
           token.role = undefined;
+          token.email = undefined;
+          token.onboarded = false;
         }
       }
       return token;
@@ -67,6 +73,8 @@ export const authOptions: NextAuthOptions = {
         (session.user as any).id = token.id ?? "";
         (session.user as any).role = token.role ?? "";
         (session.user as any).onboarded = token.onboarded;
+        session.user.sessionVersion = token.sessionVersion ?? 0;
+        session.user.email = token.email ?? "";
       }
       return session;
     },
@@ -82,6 +90,7 @@ declare module "next-auth" {
       email: string;
       name?: string | null;
       role: string;
+      sessionVersion: number;
       onboarded?: boolean;
     };
   }
@@ -91,5 +100,6 @@ declare module "next-auth/jwt" {
     id?: string;
     role?: string;
     onboarded?: boolean;
+    sessionVersion?: number;
   }
 }

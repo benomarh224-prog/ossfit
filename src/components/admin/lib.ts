@@ -13,7 +13,8 @@ export type AdminSection =
   | "services"
   | "consultations"
   | "payments"
-  | "analytics";
+  | "analytics"
+  | "account";
 
 // ---- API payload types --------------------------------------------------
 

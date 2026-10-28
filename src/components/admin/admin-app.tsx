@@ -20,6 +20,7 @@ import {
   ExternalLink,
   Menu,
   Shield,
+  Settings,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -42,6 +43,7 @@ import ServicesSection from "./sections/services";
 import ConsultationsSection from "./sections/consultations";
 import PaymentsSection from "./sections/payments";
 import AnalyticsSection from "./sections/analytics";
+import AccountSection from "./sections/account";
 
 interface NavItem {
   id: AdminSection;
@@ -50,7 +52,7 @@ interface NavItem {
 }
 
 function useNav(): NavItem[] {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   return [
     { id: "overview", label: t("admin.overview"), icon: LayoutDashboard },
     { id: "clients", label: t("admin.clients"), icon: Users },
@@ -65,6 +67,7 @@ function useNav(): NavItem[] {
     { id: "consultations", label: t("admin.consultations"), icon: CalendarCheck },
     { id: "payments", label: t("admin.payments"), icon: CreditCard },
     { id: "analytics", label: t("admin.analytics"), icon: BarChart3 },
+    { id: "account", label: locale === "ar" ? "إعدادات الحساب" : locale === "fr" ? "Paramètres du compte" : "Account settings", icon: Settings },
   ];
 }
 
@@ -315,6 +318,8 @@ function renderSection(section: AdminSection) {
       return <PaymentsSection />;
     case "analytics":
       return <AnalyticsSection />;
+    case "account":
+      return <AccountSection />;
     default:
       return null;
   }
