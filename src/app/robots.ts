@@ -5,7 +5,7 @@ export default function robots(): MetadataRoute.Robots {
   const base = siteOrigin();
   return {
     rules: [
-      { userAgent: "*", allow: "/", disallow: ["/api/", "/setup", "/admin", "/reset-password"] },
+      { userAgent: "*", allow: "/", disallow: ["/api/", "/setup", "/admin", "/account", "/reset-password"] },
     ],
     sitemap: `${base}/sitemap.xml`,
     host: base,

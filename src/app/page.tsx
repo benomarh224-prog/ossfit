@@ -1,14 +1,9 @@
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { getSiteContent, parseJSON } from "@/lib/server-utils";
 import { LandingPage } from "@/components/marketing/landing-page";
-import { ClientApp } from "@/components/dashboard/client-app";
-import { redirect } from "next/navigation";
 import { publicSiteContent } from "@/lib/site-content";
 import type { Metadata } from "next";
 import { siteOrigin } from "@/lib/site-url";
-import { signedInDestination } from "@/lib/login-access";
 
 export const dynamic = "force-dynamic";
 
@@ -52,21 +47,8 @@ async function getPublicSiteData() {
   };
 }
 
-export default async function Home({ searchParams }: { searchParams: Promise<{ view?: string }> }) {
-  const session = await getServerSession(authOptions);
-  const { view } = await searchParams;
-
-  // Authenticated coach → admin dashboard
-  if (signedInDestination(session?.user) === "/admin" && view !== "site") {
-    redirect("/admin");
-  }
-
-  // Authenticated client → client dashboard (handles onboarding gate client-side)
-  if (signedInDestination(session?.user) === "/" && view !== "site") {
-    return <ClientApp />;
-  }
-
-  // Anonymous visitor → SSR marketing landing page (good for SEO)
+export default async function Home() {
+  // Browsing the public site never signs out or redirects a remembered account.
   const data = await getPublicSiteData();
   return <LandingPage data={data} siteUrl={siteOrigin()} />;
 }

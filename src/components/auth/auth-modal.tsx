@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { recoveryCopy } from "./recovery-copy";
+import { accountCopy } from "./account-copy";
 import { getSession, signIn } from "next-auth/react";
 import { signedInDestination } from "@/lib/login-access";
 import { useForm } from "react-hook-form";
@@ -49,15 +50,15 @@ export function AuthModal({
   open,
   onOpenChange,
   defaultTab = "login",
+  switchingAccount = false,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   defaultTab?: "login" | "register";
+  switchingAccount?: boolean;
 }) {
   const { t, locale } = useI18n();
   const [loading, setLoading] = useState(false);
-  const [tab, setTab] = useState(defaultTab);
-  useEffect(() => { if (open) setTab(defaultTab); }, [open, defaultTab]);
 
   const loginForm = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
   const registerForm = useForm<RegisterValues>({ resolver: zodResolver(registerSchema) });
@@ -110,7 +111,7 @@ export function AuthModal({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md border-border/60 bg-card p-0">
+      <DialogContent showCloseButton={false} className="max-w-md border-border/60 bg-card p-0">
         <DialogHeader className="sr-only">
           <DialogTitle>{t("auth.loginTitle")}</DialogTitle>
         </DialogHeader>
@@ -125,14 +126,15 @@ export function AuthModal({
             </div>
             <button
               onClick={() => onOpenChange(false)}
-              className="absolute right-4 top-4 text-muted-foreground hover:text-foreground"
-              aria-label="Close"
+              className="absolute end-2 top-2 flex size-11 items-center justify-center rounded-xl text-muted-foreground hover:bg-accent hover:text-foreground"
+              aria-label={t("actions.close")}
             >
               <X className="h-5 w-5" />
             </button>
           </div>
-          <div className="p-6">
-            <Tabs value={tab} onValueChange={(value) => setTab(value as "login" | "register")} className="w-full">
+          <div className="space-y-4 p-6">
+            {switchingAccount && <div role="status" className="space-y-1 rounded-xl border border-primary/20 bg-primary/5 p-3"><p className="text-sm font-semibold">{accountCopy[locale].switchingTitle}</p><p className="text-xs leading-relaxed text-muted-foreground">{accountCopy[locale].switchHint}</p></div>}
+            <Tabs key={`${open}:${defaultTab}`} defaultValue={defaultTab} className="w-full">
               <TabsList className="grid w-full grid-cols-2">
                 <TabsTrigger value="login">{t("nav.login")}</TabsTrigger>
                 <TabsTrigger value="register">{t("nav.register")}</TabsTrigger>
@@ -211,6 +213,7 @@ export function AuthModal({
                 </form>
               </TabsContent>
             </Tabs>
+            <p className="text-[11px] leading-relaxed text-muted-foreground">{accountCopy[locale].persistence}</p>
           </div>
         </div>
       </DialogContent>

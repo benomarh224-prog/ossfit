@@ -110,7 +110,7 @@ export function ClientApp() {
         </button>
       ))}
       <div className="mt-auto pt-3">
-        <Button asChild variant="ghost" size="sm" className="min-h-11 w-full justify-start text-foreground/60"><a href="/?view=site">{locale === "ar" ? "الرجوع للموقع الرئيسي" : locale === "fr" ? "Retour au site" : "Back to website"}</a></Button>
+        <Button asChild variant="ghost" size="sm" className="min-h-11 w-full justify-start text-foreground/60"><a href="/">{locale === "ar" ? "الرجوع للموقع الرئيسي" : locale === "fr" ? "Retour au site" : "Back to website"}</a></Button>
         <Button variant="ghost" size="sm" className="w-full justify-start text-foreground/60" onClick={() => signOut({ callbackUrl: "/" })}>
           <LogOut className="mr-2 h-4 w-4" />
           {t("nav.logout")}

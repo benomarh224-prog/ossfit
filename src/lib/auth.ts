@@ -5,9 +5,11 @@ import { db } from "@/lib/db";
 import { allowRequest, requestIp } from "@/lib/rate-limit";
 import { isSessionCurrent } from "@/lib/account-security";
 import { loginPortalAllowsRole } from "@/lib/login-access";
+import { SESSION_MAX_AGE } from "@/lib/session-policy";
 
 export const authOptions: NextAuthOptions = {
-  session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
+  session: { strategy: "jwt", maxAge: SESSION_MAX_AGE },
+  jwt: { maxAge: SESSION_MAX_AGE },
   pages: {
     signIn: "/",
   },

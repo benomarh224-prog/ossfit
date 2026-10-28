@@ -14,5 +14,5 @@ export const metadata: Metadata = {
 export default async function AdminPage() {
   const session = await getServerSession(authOptions);
   if (signedInDestination(session?.user) === "/admin") return <AdminApp />;
-  return <AdminLogin clientSignedIn={signedInDestination(session?.user) === "/"} />;
+  return <AdminLogin clientSignedIn={signedInDestination(session?.user) === "/account"} />;
 }

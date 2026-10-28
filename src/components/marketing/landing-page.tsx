@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getSession, useSession } from "next-auth/react";
 import { SiteHeader } from "@/components/site/site-header";
 import { SiteFooter } from "@/components/site/site-footer";
 import { WhatsAppFloat } from "@/components/site/whatsapp-float";
@@ -8,6 +9,7 @@ import { AuthModal } from "@/components/auth/auth-modal";
 import { Hero } from "./hero";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { localizeMarketing, localizeSiteContent } from "@/lib/marketing-copy";
+import { signedInDestination } from "@/lib/login-access";
 import {
   MeetCoach,
   WhyChoose,
@@ -31,19 +33,23 @@ type SiteData = {
 
 export function LandingPage({ data, siteUrl }: { data: SiteData; siteUrl: string }) {
   const { locale } = useI18n();
+  const { data: session, status } = useSession();
   const [authOpen, setAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<"login" | "register">("login");
 
   useEffect(() => {
-    const handler = (e: Event) => {
+    const handler = async (e: Event) => {
       const detail = (e as CustomEvent).detail;
-      if (detail?.packageId) sessionStorage.setItem("preferredPackageId", detail.packageId);
+      if (detail?.packageId) { try { sessionStorage.setItem("preferredPackageId", detail.packageId); } catch { /* Browsing without optional storage must still work. */ } }
+      const current = status === "loading" ? await getSession() : session;
+      const destination = signedInDestination(current?.user);
+      if (destination) { window.location.assign(destination); return; }
       setAuthTab(detail === "register" || detail?.tab === "register" ? "register" : "login");
       setAuthOpen(true);
     };
     window.addEventListener("atlas:open-auth", handler);
     return () => window.removeEventListener("atlas:open-auth", handler);
-  }, []);
+  }, [session, status]);
 
   const content = localizeSiteContent(data.content, locale);
 

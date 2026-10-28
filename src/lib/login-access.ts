@@ -6,9 +6,9 @@ export function loginPortalAllowsRole(role: string, portal: unknown): boolean {
   return role === "COACH" || role === "CLIENT";
 }
 
-export function signedInDestination(user: LoginUser): "/admin" | "/" | null {
+export function signedInDestination(user: LoginUser): "/admin" | "/account" | null {
   if (!user?.id) return null;
   if (user.role === "COACH") return "/admin";
-  if (user.role === "CLIENT") return "/";
+  if (user.role === "CLIENT") return "/account";
   return null;
 }

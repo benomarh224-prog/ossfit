@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { recoveryCopy } from "./recovery-copy";
+import { accountCopy } from "./account-copy";
 
 const COPY = {
   en: { title: "Your coaching workspace.", intro: "Sign in with the coach account created through your private owner setup link.", badge: "Coach administration", client: "A subscriber account is currently signed in. Enter your coach credentials below to switch accounts.", email: "Coach email", password: "Password", login: "Open administration", error: "Unable to sign in as coach. Check your coach email and password. Regular subscriber accounts cannot access administration.", back: "Back to website", logout: "Sign out of subscriber account" },
@@ -52,6 +53,7 @@ export function AdminLogin({ clientSignedIn }: { clientSignedIn: boolean }) {
       <h1 className="mt-3 font-display text-3xl uppercase">{c.title}</h1>
       <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{c.intro}</p>
       {clientSignedIn && <p className="mt-5 rounded-xl border border-primary/20 bg-primary/5 p-3 text-sm leading-relaxed" role="status">{c.client}</p>}
+      {clientSignedIn && <Button asChild variant="outline" className="mt-3 min-h-11 h-auto w-full whitespace-normal"><a href="/account">{accountCopy[locale].open}</a></Button>}
       <form onSubmit={submit} className="mt-6 space-y-4">
         <fieldset disabled={loading} className="space-y-4">
           <div className="space-y-2"><Label htmlFor="admin-email">{c.email}</Label><Input id="admin-email" name="email" type="email" autoComplete="username" dir="ltr" required maxLength={254} /></div>
@@ -60,6 +62,7 @@ export function AdminLogin({ clientSignedIn }: { clientSignedIn: boolean }) {
           <Button type="submit" className="min-h-12 w-full whitespace-normal py-3" disabled={loading}>{loading ? <Loader2 className="size-4 animate-spin" /> : <ArrowRight className="size-4 rtl:rotate-180" />}{c.login}</Button>
         </fieldset>
       </form>
+      <p className="mt-4 text-xs leading-relaxed text-muted-foreground">{accountCopy[locale].persistence}</p>
       <Link href="/reset-password" className="mt-3 flex min-h-11 items-center justify-center text-sm font-medium text-primary hover:underline">{recoveryCopy[locale].forgot}</Link>
       {clientSignedIn && <Button variant="ghost" className="mt-3 min-h-11 w-full whitespace-normal text-muted-foreground" disabled={loading} onClick={() => signOut({ callbackUrl: "/admin" })}>{c.logout}</Button>}
     </div>

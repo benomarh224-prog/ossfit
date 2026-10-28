@@ -31,5 +31,5 @@ test('switching between subscriber and coach selects the destination of the new 
     { id: 'coach', role: 'COACH' },
     { id: '', role: '' },
     { id: 'subscriber', role: 'CLIENT' },
-  ].map(signedInDestination), ['/', '/admin', null, '/']);
+  ].map(signedInDestination), ['/account', '/admin', null, '/account']);
 });
