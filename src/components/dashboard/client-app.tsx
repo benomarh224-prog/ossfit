@@ -5,7 +5,7 @@ import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { signOut, useSession } from "next-auth/react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import {
   LayoutDashboard, Dumbbell, Salad, TrendingUp, MessageSquare,
   CreditCard, Calendar, User, LogOut, Dumbbell as Logo, Menu, X,
@@ -24,6 +24,7 @@ import { ClientOverview } from "./overview";
 import type { ClientSection } from "@/lib/dashboard-overview";
 import { LanguageSwitcher } from "@/components/site/language-switcher";
 import { ThemeSwitcher } from "@/components/site/theme-switcher";
+import { MobileNav } from "./mobile-nav";
 
 const Workouts = dynamic(() => import("./sections").then(module => module.Workouts), { loading: () => <SectionLoading /> });
 const Nutrition = dynamic(() => import("./sections").then(module => module.Nutrition), { loading: () => <SectionLoading /> });
@@ -48,6 +49,7 @@ const NAV: { id: Section; icon: any; key: string }[] = [
 
 export function ClientApp() {
   const { t, locale } = useI18n();
+  const reduceMotion = useReducedMotion();
   const qc = useQueryClient();
   const { data: session } = useSession();
   const [section, setSection] = useState<Section>("overview");
@@ -105,7 +107,7 @@ export function ClientApp() {
           <n.icon className="h-4 w-4" />
           {t(n.key)}
           {n.id === "messages" && me?.unreadMessages > 0 && (
-            <Badge className="ml-auto bg-primary-foreground text-primary">{me.unreadMessages}</Badge>
+            <Badge className={`ms-auto ${section === n.id ? "bg-primary-foreground text-primary" : "bg-primary/15 text-primary"}`}>{me.unreadMessages}</Badge>
           )}
         </button>
       ))}
@@ -120,17 +122,19 @@ export function ClientApp() {
   );
 
   return (
+    <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
     <div className="flex min-h-screen flex-col bg-background">
       {/* Top bar */}
       <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-xl">
-        <div className="flex h-16 items-center justify-between px-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-3">
-            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <div className="flex h-16 items-center justify-between gap-2 px-3 sm:px-6">
+          <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+            <SheetTrigger asChild><Button variant="ghost" size="icon" className="size-11 shrink-0 rounded-xl lg:hidden" aria-label={locale === "ar" ? "فتح القائمة" : locale === "fr" ? "Ouvrir le menu" : "Open menu"}><Menu className="size-5" /></Button></SheetTrigger>
+            <span className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground sm:flex">
               <Logo className="h-5 w-5" />
             </span>
             <div className="min-w-0">
               <p className="truncate font-display text-sm font-bold uppercase leading-none sm:text-lg">{content?.brandName || "Coach Oussama"}</p>
-              <Badge variant="outline" className="mt-0.5 text-[10px] uppercase text-primary">{t("nav.dashboard")}</Badge>
+              <p className="mt-1 truncate text-[10px] text-muted-foreground">{t(NAV.find(item => item.id === section)!.key)}</p>
             </div>
           </div>
           <div className="flex shrink-0 items-center gap-0 sm:gap-2">
@@ -147,18 +151,12 @@ export function ClientApp() {
 
       <div className="flex flex-1">
         {/* Desktop sidebar */}
-        <aside className="hidden w-64 shrink-0 border-r border-border/50 bg-card/30 lg:flex lg:flex-col">
+        <aside className="hidden w-64 shrink-0 border-e border-border/50 bg-card/30 lg:flex lg:flex-col">
           {NavContent}
         </aside>
 
         {/* Mobile sidebar */}
         <div className="lg:hidden">
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] end-4 z-40 size-12 rounded-full bg-primary text-primary-foreground shadow-lg lg:hidden" aria-label={locale === "ar" ? "فتح القائمة" : locale === "fr" ? "Ouvrir le menu" : "Open menu"}>
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
             <SheetContent side={locale === "ar" ? "right" : "left"} showCloseButton={false} className="w-[min(19rem,88vw)] gap-0 p-0">
               <SheetTitle className="sr-only">{t("nav.dashboard")}</SheetTitle><SheetDescription className="sr-only">{t("nav.dashboard")}</SheetDescription>
               <div className="flex items-center justify-between border-b border-border/50 p-3">
@@ -167,18 +165,18 @@ export function ClientApp() {
               </div>
               {NavContent}
             </SheetContent>
-          </Sheet>
         </div>
 
         {/* Main */}
-        <main className="min-w-0 flex-1 p-4 pb-24 sm:p-6 sm:pb-24 lg:p-8">
+        <main className="min-w-0 flex-1 p-4 pb-[calc(6rem+env(safe-area-inset-bottom))] sm:p-6 sm:pb-[calc(6rem+env(safe-area-inset-bottom))] lg:p-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={section}
-              initial={{ opacity: 0, y: 12 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: reduceMotion ? 0 : 0.2 }}
+              className="mx-auto max-w-6xl"
             >
               {section === "overview" && <ClientOverview me={me} onNavigate={switchSection} />}
               {section === "workouts" && <Workouts whatsapp={whatsapp} initialDayIndex={workoutDayIndex} />}
@@ -192,7 +190,9 @@ export function ClientApp() {
           </AnimatePresence>
         </main>
       </div>
+      <MobileNav section={section} unread={me.unreadMessages} onNavigate={switchSection} />
     </div>
+    </Sheet>
   );
 }
 

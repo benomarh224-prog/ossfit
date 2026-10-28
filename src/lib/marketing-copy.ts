@@ -390,6 +390,15 @@ export function localizeSiteContent(content: any, locale: Locale) {
   for (const key of Object.keys(defaultContent.en) as (keyof typeof defaultContent.en)[]) {
     if (content[key] === defaultContent.en[key]) result[key] = defaultContent[locale][key];
   }
+  // Shorter presentation for the original defaults; the coach's own copy is preserved.
+  if (content.heroTitle === defaultContent.en.heroTitle) result.heroTitle = {
+    en: "TRAIN WITH PURPOSE.", fr: "VOTRE OBJECTIF. UN VRAI PLAN.", ar: "تدرّب بهدف. تقدّم بثقة.",
+  }[locale];
+  if (content.heroSubtitle === defaultContent.en.heroSubtitle) result.heroSubtitle = {
+    en: "Personal training, practical nutrition and direct support from Coach Oussama. Your program, wherever you train.",
+    fr: "Entraînement personnel, nutrition pratique et suivi avec Coach Oussama. Votre programme, où que vous soyez.",
+    ar: "تدريب شخصي، توجيه غذائي ومواكبة مع المدرب أسامة. برنامجك معك، فين ما كنت كتتمرّن.",
+  }[locale];
   if (content.coachName === "Oussama" && locale === "ar") result.coachName = "أسامة";
   if (content.coachCity === "Morocco") result.coachCity = locale === "ar" ? "المغرب" : locale === "fr" ? "Maroc" : "Morocco";
   return result;

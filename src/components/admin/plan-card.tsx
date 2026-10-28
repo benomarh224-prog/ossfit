@@ -31,7 +31,7 @@ type PlanCardProps = {
 export function PlanCard({ id, title, client, active, kind, icon: Icon, summary, stats, expanded, deleting, onEdit, onExpand, onDelete, children }: PlanCardProps) {
   const { t, locale } = useI18n(); const c = planCopy[locale];
   const detailsId = `plan-details-${id}`;
-  return <article className={cn("min-w-0 overflow-hidden rounded-2xl border border-border/80 bg-card shadow-[0_2px_8px_0_rgb(0_0_0/0.025)] transition-colors", expanded && "border-primary/30 md:col-span-2")} aria-label={title}>
+  return <article className={cn("surface-card overflow-hidden transition-colors", expanded && "border-primary/30 md:col-span-2")} aria-label={title}>
     <div className="p-4 sm:p-5">
       <div className="flex items-start gap-3">
         <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-primary/10 bg-primary/8 text-primary"><Icon className="size-5" /></div>

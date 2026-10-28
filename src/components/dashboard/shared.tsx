@@ -46,7 +46,7 @@ export function KpiCard({
   hint?: string;
 }) {
   return (
-    <Card className="border-border/50 bg-card/60">
+    <Card className="gap-0 py-0">
       <CardContent className="p-5">
         <div className="flex items-center justify-between">
           <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
@@ -54,7 +54,7 @@ export function KpiCard({
           </span>
           {Icon && <Icon className="h-4 w-4 text-primary" />}
         </div>
-        <p className="mt-2 font-display text-2xl font-bold">{value}</p>
+        <p className="mt-2 break-words text-3xl font-semibold tracking-tight tabular-nums">{value}</p>
         {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
       </CardContent>
     </Card>
@@ -65,7 +65,7 @@ export function SectionLoading() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
-        <Skeleton key={i} className="h-32 rounded-xl" />
+        <Skeleton key={i} className="h-32 rounded-2xl" />
       ))}
     </div>
   );
@@ -82,8 +82,8 @@ export function EmptyState({
 }) {
   const { t } = useI18n();
   return (
-    <Card className="border-dashed border-border/50 bg-card/40">
-      <CardContent className="flex flex-col items-center justify-center gap-3 p-10 text-center">
+    <Card className="gap-0 border-dashed py-0">
+      <CardContent className="flex flex-col items-center justify-center gap-3 px-5 py-7 text-center sm:p-8">
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
           <Inbox className="h-6 w-6" />
         </span>
@@ -105,6 +105,7 @@ export function EmptyState({
 export function MotionCard({ children, delay = 0 }: { children: ReactNode; delay?: number }) {
   return (
     <motion.div
+      className="min-w-0"
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, delay }}

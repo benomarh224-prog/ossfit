@@ -48,6 +48,7 @@
 /* Premium fitness brand — dark-first, charcoal + electric lime */
 :root {
   --radius: 0.75rem;
+  --card-shadow: 0 2px 8px rgb(0 0 0 / 0.12);
   color-scheme: dark;
 
   /* Dark theme is the default for this premium fitness brand */
@@ -90,6 +91,7 @@
 }
 
 .light {
+  --card-shadow: 0 2px 10px rgb(20 28 20 / 0.035), 0 1px 2px rgb(20 28 20 / 0.02);
   color-scheme: light;
   --background: oklch(0.985 0.002 264);
   --foreground: oklch(0.15 0.005 264);
@@ -157,6 +159,17 @@
   }
   ::-webkit-scrollbar-thumb:hover {
     background: var(--primary);
+  }
+}
+
+@layer components {
+  .surface-card {
+    min-width: 0;
+    border: 1px solid color-mix(in oklch, var(--border) 75%, transparent);
+    border-radius: 1rem;
+    background-color: var(--card);
+    color: var(--card-foreground);
+    box-shadow: var(--card-shadow);
   }
 }
 

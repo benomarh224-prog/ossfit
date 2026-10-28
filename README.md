@@ -43,6 +43,10 @@ The client's nutrition screen shows the coach's actual meal suggestions and note
 
 ## Access and uploads
 
+On phones and tablets below the desktop breakpoint, the client workspace has a five-item bottom navigation: Home, Workouts, Nutrition, Messages and Account. The top menu retains Progress, Subscription, Consultations, the website link and sign-out. The active item and unread message count are visible; content includes bottom safe-area clearance. Desktop retains the full sidebar.
+
+Cards share theme-aware borders, corners and subtle shadows, with compact padding and larger daily figures. The public hero separates readable text from photography; an uploaded coach portrait takes precedence over illustrative training imagery. Only the original default hero copy is shortened, preserving custom coach text. Pricing cards show the amount, currency and duration separately, keep desktop actions aligned and retain the existing registration/package selection flow.
+
 The appearance menu in the website and dashboards offers Light, Dark and Use device setting. The choice persists in the browser. The original dark appearance remains the default until a visitor selects another option.
 
 Client uploads are private to their owner and the coach. Marketing uploads by the coach are public content; these images are decoded, stripped of metadata, resized and converted to WebP (3 MB input limit, 30 uploads per account per rolling day).

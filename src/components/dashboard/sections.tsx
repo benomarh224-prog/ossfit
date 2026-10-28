@@ -75,17 +75,17 @@ export function Workouts({ whatsapp, initialDayIndex }: { whatsapp?: string; ini
             <MotionCard key={i} delay={i * 0.05}>
               <Card ref={i === initialDayIndex ? selectedSession : undefined} className={`scroll-mt-24 border-border/50 bg-card/60 ${i === initialDayIndex ? "border-primary/30 ring-1 ring-primary/10" : ""}`}>
                 <CardHeader className="pb-3">
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="font-display text-base font-bold uppercase">{workoutDayName(d)}</CardTitle>
-                    <Badge variant="outline" className="text-primary">{d.focus}</Badge>
+                  <div className="flex flex-wrap items-start justify-between gap-2">
+                    <CardTitle className="min-w-0 flex-1 text-base font-semibold">{workoutDayName(d)}</CardTitle>
+                    {d.focus && <Badge variant="outline" className="max-w-full whitespace-normal break-words text-primary">{d.focus}</Badge>}
                   </div>
                   {i === initialDayIndex && <p className="text-[10px] font-medium text-primary">{overviewCopy[locale].selected}</p>}
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {d.exercises?.map((ex: any, idx: number) => (
-                    <div key={idx} className="flex items-center justify-between rounded-lg border border-border/50 bg-card/40 p-2.5 text-sm">
-                      <span className="font-medium">{ex.name}</span>
-                      <span className="text-xs text-muted-foreground">{ex.sets}×{ex.reps} · {ex.rest}</span>
+                    <div key={idx} className="flex min-w-0 items-start justify-between gap-3 rounded-xl bg-secondary/55 p-3 text-sm">
+                      <span className="min-w-0 flex-1 break-words font-medium">{ex.name}</span>
+                      <span className="max-w-[45%] shrink-0 break-words text-end text-xs tabular-nums text-muted-foreground">{ex.sets}×{ex.reps} · {ex.rest}</span>
                     </div>
                   ))}
                 </CardContent>

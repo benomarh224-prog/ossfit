@@ -9,7 +9,7 @@ import { useState } from "react";
 import { useI18n, formatMAD } from "@/lib/i18n/i18n-provider";
 import { buildWhatsappLink } from "@/lib/client-utils";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Accordion,
@@ -40,15 +40,15 @@ function SectionHeading({
       className={center ? "mx-auto max-w-2xl text-center" : "max-w-2xl"}
     >
       {eyebrow && (
-        <span className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wider text-primary">
-          <Sparkles className="h-3 w-3" />
+        <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-primary/20 bg-primary/8 px-3 py-1.5 text-[10px] font-medium leading-relaxed text-primary sm:text-xs">
+          <Sparkles className="h-3 w-3 shrink-0" aria-hidden="true" />
           {eyebrow}
         </span>
       )}
       <h2 className="mt-3 text-balance font-display text-[1.75rem] font-bold uppercase leading-tight tracking-tight text-foreground sm:mt-4 sm:text-4xl lg:text-5xl">
         {title}
       </h2>
-      {tag && <p className="mt-3 text-base text-muted-foreground sm:text-lg">{tag}</p>}
+      {tag && <p className="mt-3 text-sm leading-relaxed text-muted-foreground sm:text-base">{tag}</p>}
     </motion.div>
   );
 }
@@ -77,7 +77,7 @@ export function MeetCoach({ content }: { content: any }) {
   ];
 
   return (
-    <section id="about" className="relative py-10 sm:py-14 lg:py-20">
+    <section id="about" className="relative py-8 sm:py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading
           eyebrow={t("sections.meetCoachTag")}
@@ -94,7 +94,6 @@ export function MeetCoach({ content }: { content: any }) {
             <div className="absolute -inset-4 -z-10 rounded-3xl bg-primary/10 blur-2xl" />
             <div className="overflow-hidden rounded-2xl border border-border/50 bg-card">
               {portrait ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={portrait}
                   alt={illustrativePortrait ? "Strength training space" : content.coachName}
@@ -221,7 +220,7 @@ export function WhyChoose() {
     return text ? { ...reason, title: text[0], desc: text[1] } : reason;
   });
   return (
-    <section className="relative border-y border-border/40 bg-card/30 py-10 sm:py-14 lg:py-20">
+    <section className="relative border-y border-border/40 bg-card/30 py-8 sm:py-12 lg:py-16">
       <div className="bg-grid absolute inset-0 opacity-40" />
       <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.whyChooseTag")} title={t("sections.whyChoose")} />
@@ -259,7 +258,7 @@ export function Services({ services }: { services: any[] }) {
   const { t } = useI18n();
   const icons: Record<string, any> = { dumbbell: Dumbbell, flame: Flame, salad: Salad, video: Video };
   return (
-    <section id="services" className="py-10 sm:py-14 lg:py-20">
+    <section id="services" className="py-8 sm:py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.servicesTag")} title={t("sections.services")} />
         <div className="mt-7 grid gap-3 sm:mt-10 sm:grid-cols-2 sm:gap-5 lg:mt-14 lg:grid-cols-4">
@@ -277,7 +276,6 @@ export function Services({ services }: { services: any[] }) {
                 <Card className="group grid h-full grid-cols-[4.5rem_1fr] gap-3 overflow-hidden border-border/50 bg-card/60 p-3 sm:flex sm:flex-col sm:gap-0 sm:p-0">
                   <div className="relative h-24 overflow-hidden rounded-lg sm:aspect-[4/3] sm:h-auto sm:rounded-none">
                     {s.image ? (
-                      // eslint-disable-next-line @next/next/no-img-element
                       <img src={s.image} alt={s.title} loading="lazy" className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
                     ) : (
                       <div className="h-full w-full bg-gradient-to-br from-primary/20 to-card" />
@@ -326,10 +324,10 @@ export function HowItWorks() {
     return text ? { ...step, title: text[0], desc: text[1] } : step;
   });
   return (
-    <section id="how" className="border-y border-border/40 bg-card/30 py-10 sm:py-14 lg:py-20">
+    <section id="how" className="border-y border-border/40 bg-card/30 py-8 sm:py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.howItWorksTag")} title={t("sections.howItWorks")} />
-        <div className="relative mt-7 sm:mt-10 lg:mt-14">
+        <div className="relative mt-6 sm:mt-8 lg:mt-10">
           <div className="absolute left-0 top-12 hidden h-px w-full bg-gradient-to-r from-primary/40 via-primary/20 to-transparent lg:block" />
           <div className="grid gap-6 sm:grid-cols-2 sm:gap-8 lg:grid-cols-4">
             {steps.map((s, i) => (
@@ -359,10 +357,10 @@ export function Transformations({ transformations }: { transformations: any[] })
   const { t, locale } = useI18n();
   if (!transformations?.length) return null;
   return (
-    <section id="results" className="py-10 sm:py-14 lg:py-20">
+    <section id="results" className="py-8 sm:py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.galleryTag")} title={t("sections.gallery")} />
-        <div className="mt-7 sm:mt-10 lg:mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 sm:mt-8 lg:mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {transformations.map((tr, i) => (
             <motion.div
               key={tr.id}
@@ -376,7 +374,6 @@ export function Transformations({ transformations }: { transformations: any[] })
                 <div className="grid grid-cols-2">
                   <div className="relative aspect-[3/4] overflow-hidden">
                     {tr.beforeImg ? (
-                      // eslint-disable-next-line @next/next/no-img-element
                       <img src={tr.beforeImg} alt="Before" className="h-full w-full object-cover grayscale" />
                     ) : (
                       <div className="h-full w-full bg-card" />
@@ -385,7 +382,6 @@ export function Transformations({ transformations }: { transformations: any[] })
                   </div>
                   <div className="relative aspect-[3/4] overflow-hidden">
                     {tr.afterImg ? (
-                      // eslint-disable-next-line @next/next/no-img-element
                       <img src={tr.afterImg} alt="After" className="h-full w-full object-cover" />
                     ) : (
                       <div className="h-full w-full bg-card" />
@@ -424,7 +420,7 @@ export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsa
   };
 
   return (
-    <section id="packages" className="scroll-mt-20 border-y border-border/40 bg-card/30 py-10 sm:py-14 lg:py-20">
+    <section id="packages" className="scroll-mt-20 border-y border-border/40 bg-card/30 py-8 sm:py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.packagesTag")} title={t("sections.packages")} />
         {packages.length === 0 && (
@@ -432,7 +428,7 @@ export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsa
             {t("sections.packagesEmpty")}
           </p>
         )}
-        <div className="mt-7 grid gap-4 sm:mt-10 sm:gap-6 lg:mt-14 lg:grid-cols-3">
+        <div className="mt-6 grid gap-4 sm:mt-8 sm:gap-5 lg:mt-10 lg:grid-cols-3">
           {packages.map((p, i) => {
             const featured = p.featured;
             const waMsg = `Hello! I'm interested in the "${p.title}" package (${p.priceMAD} MAD). Can you share the next steps?`;
@@ -445,47 +441,45 @@ export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsa
                 initial="hidden"
                 whileInView="show"
                 viewport={{ once: true, margin: "-24px" }}
-                className={featured ? "lg:-mt-4 lg:mb-4" : ""}
+                className="min-w-0"
               >
                 <Card
-                  className={`relative flex h-full flex-col gap-4 overflow-hidden border py-5 sm:py-6 ${
-                    featured ? "border-primary bg-card shadow-2xl shadow-primary/10" : "border-border/50 bg-card/60"
+                  className={`relative flex h-full flex-col gap-0 overflow-hidden p-0 ${
+                    featured ? "border-primary/60 ring-1 ring-primary/15" : "border-border/75"
                   }`}
                 >
-                  <CardHeader className="px-5 pb-0 sm:px-6">
+                  <div className={`h-1 w-full ${featured ? "bg-primary" : "bg-secondary"}`} aria-hidden="true" />
+                  <div className="p-5 pb-0 sm:p-6 sm:pb-0">
                     <div className="flex flex-wrap items-center justify-between gap-2">
-                      <h3 className="font-display text-xl font-bold uppercase tracking-tight">{p.title}</h3>
+                      <h3 className="break-words text-lg font-semibold tracking-tight">{p.title}</h3>
                       {featured && <span className="inline-flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-primary-foreground"><Star className="h-3 w-3" />{t("common.featured")}</span>}
                     </div>
-                    <p className="text-sm text-muted-foreground">{p.tagline}</p>
-                  </CardHeader>
-                  <CardContent className="flex flex-1 flex-col px-5 sm:px-6">
-                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-                      <span className="font-display text-4xl font-bold text-primary">
-                        {formatMAD(p.priceMAD, locale)}
-                      </span>
-                      <span className="text-xs text-muted-foreground">/ {p.durationLabel?.toLowerCase().includes("month") ? t("common.monthly") : p.durationLabel}</span>
+                    <p className="mt-2 break-words text-xs leading-relaxed text-muted-foreground sm:text-sm lg:min-h-10">{p.tagline}</p>
+                    <div className="mt-5 flex flex-wrap items-baseline gap-x-2 gap-y-1" aria-label={formatMAD(p.priceMAD, locale)}>
+                      <bdi className="text-5xl font-semibold leading-none tracking-tight tabular-nums">{new Intl.NumberFormat(locale === "ar" ? "ar-MA" : locale === "fr" ? "fr-MA" : "en-MA", { maximumFractionDigits: 0 }).format(p.priceMAD)}</bdi>
+                      <span className="text-xs font-medium text-muted-foreground">{locale === "ar" ? "درهم" : "MAD"}</span>
                     </div>
-                    <p className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <MessageCircle className="h-3.5 w-3.5 text-primary" />
-                      {p.supportLevel}
-                    </p>
-                    <ul className="mt-5 space-y-2.5">
+                    {p.durationLabel && <p className="mt-2 text-xs text-muted-foreground">{p.durationLabel.toLowerCase().includes("month") ? t("common.monthly") : p.durationLabel}</p>}
+                    {p.supportLevel && <p className="mt-4 flex items-start gap-2 rounded-xl bg-primary/6 px-3 py-2.5 text-xs leading-relaxed text-primary"><MessageCircle className="mt-0.5 size-3.5 shrink-0" aria-hidden="true" />{p.supportLevel}</p>}
+                  </div>
+                  <CardContent className="flex flex-1 flex-col px-5 pb-5 sm:px-6 sm:pb-6">
+                    <ul className="mt-4 space-y-3 border-t border-border/60 pt-4">
                       {p.features?.map((f: string, idx: number) => (
-                        <li key={idx} className="flex items-start gap-2 text-sm text-foreground/80">
-                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                          {f}
+                        <li key={idx} className="flex items-start gap-2.5 text-xs leading-relaxed text-foreground/85 sm:text-sm">
+                          <CheckCircle2 className="mt-0.5 h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
+                          <span className="min-w-0 break-words">{f}</span>
                         </li>
                       ))}
                     </ul>
-                    <div className="mt-auto flex flex-col gap-2 pt-6">
+                    <div className="mt-auto flex flex-col gap-1.5 pt-6">
                       <Button
                         onClick={() => authTrigger(p.id)}
-                        className={`min-h-11 w-full whitespace-normal py-3 ${featured ? "bg-primary text-primary-foreground hover:bg-primary/90" : ""}`}
+                        className={`h-auto min-h-12 w-full whitespace-normal rounded-xl py-3 shadow-none ${featured ? "bg-primary text-primary-foreground hover:bg-primary/90" : "border-border/80"}`}
                         variant={featured ? "default" : "outline"}
+                        aria-label={`${t("cta.start")} — ${p.title}`}
                       >
                         {t("cta.start")}
-                        <ArrowRight className="ml-2 h-4 w-4" />
+                        <ArrowRight className="size-4 rtl:rotate-180" aria-hidden="true" />
                       </Button>
                       <Button asChild variant="ghost" size="sm" className="min-h-11 w-full whitespace-normal py-3 text-foreground/70 hover:text-primary">
                         <a href={wa} target="_blank" rel="noreferrer">
@@ -500,7 +494,8 @@ export function Packages({ packages, whatsappNumber }: { packages: any[]; whatsa
             );
           })}
         </div>
-        <p className="mx-auto mt-8 max-w-2xl text-center text-xs text-muted-foreground">
+        <p className="mx-auto mt-6 flex max-w-2xl items-start gap-2.5 rounded-2xl border border-border/60 bg-background/70 p-4 text-xs leading-relaxed text-muted-foreground">
+          <ShieldCheck className="mt-0.5 size-4 shrink-0 text-primary" aria-hidden="true" />
           {locale === "fr"
             ? "Paiement par virement bancaire en dirhams (MAD). L'abonnement est activé après vérification du coach."
             : locale === "ar"
@@ -517,10 +512,10 @@ export function Testimonials({ testimonials }: { testimonials: any[] }) {
   const { t } = useI18n();
   if (!testimonials?.length) return null;
   return (
-    <section id="testimonials" className="py-10 sm:py-14 lg:py-20">
+    <section id="testimonials" className="py-8 sm:py-12 lg:py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.testimonialsTag")} title={t("sections.testimonials")} />
-        <div className="mt-7 sm:mt-10 lg:mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-6 sm:mt-8 lg:mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((tm, i) => (
             <motion.div
               key={tm.id}
@@ -575,7 +570,7 @@ export function FAQ({ faqs }: { faqs: any[] }) {
   const { t } = useI18n();
   if (!faqs?.length) return null;
   return (
-    <section id="faq" className="border-y border-border/40 bg-card/30 py-10 sm:py-14 lg:py-20">
+    <section id="faq" className="border-y border-border/40 bg-card/30 py-8 sm:py-12 lg:py-16">
       <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
         <SectionHeading eyebrow={t("sections.faqTag")} title={t("sections.faq")} />
         <Accordion type="single" collapsible className="mt-7 w-full sm:mt-10">
