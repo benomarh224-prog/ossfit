@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { useQuery } from "@tanstack/react-query";
 import { useQueryClient } from "@tanstack/react-query";
 import { signOut, useSession } from "next-auth/react";
@@ -18,13 +19,21 @@ import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetTitle, SheetDescrip
 import { Notifications } from "@/components/notifications";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Onboarding } from "@/components/auth/onboarding";
-import {
-  Overview, Workouts, Nutrition, ProgressSection, Messages, Subscription, Consultations, Profile,
-} from "./sections";
+import { SectionLoading } from "./shared";
+import { ClientOverview } from "./overview";
+import type { ClientSection } from "@/lib/dashboard-overview";
 import { LanguageSwitcher } from "@/components/site/language-switcher";
 import { ThemeSwitcher } from "@/components/site/theme-switcher";
 
-type Section = "overview" | "workouts" | "nutrition" | "progress" | "messages" | "subscription" | "consultations" | "profile";
+const Workouts = dynamic(() => import("./sections").then(module => module.Workouts), { loading: () => <SectionLoading /> });
+const Nutrition = dynamic(() => import("./sections").then(module => module.Nutrition), { loading: () => <SectionLoading /> });
+const ProgressSection = dynamic(() => import("./sections").then(module => module.ProgressSection), { loading: () => <SectionLoading /> });
+const Messages = dynamic(() => import("./sections").then(module => module.Messages), { loading: () => <SectionLoading /> });
+const Subscription = dynamic(() => import("./sections").then(module => module.Subscription), { loading: () => <SectionLoading /> });
+const Consultations = dynamic(() => import("./sections").then(module => module.Consultations), { loading: () => <SectionLoading /> });
+const Profile = dynamic(() => import("./sections").then(module => module.Profile), { loading: () => <SectionLoading /> });
+
+type Section = ClientSection;
 
 const NAV: { id: Section; icon: any; key: string }[] = [
   { id: "overview", icon: LayoutDashboard, key: "dashboard.overview" },
@@ -43,10 +52,15 @@ export function ClientApp() {
   const { data: session } = useSession();
   const [section, setSection] = useState<Section>("overview");
   const [mobileOpen, setMobileOpen] = useState(false);
-  function switchSection(value: Section) { setSection(value); setMobileOpen(false); }
+  const [workoutDayIndex, setWorkoutDayIndex] = useState<number | undefined>(undefined);
+  function switchSection(value: Section, dayIndex?: number) {
+    if (value === "workouts") setWorkoutDayIndex(dayIndex);
+    setSection(value); setMobileOpen(false);
+    if (value !== "workouts" || dayIndex === undefined) window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "auto" }));
+  }
   function openNotification(type: string) {
     const destination: Record<string, Section> = { message: "messages", workout: "workouts", nutrition: "nutrition", payment: "subscription", success: "subscription", warning: "subscription", consultation: "consultations", security: "profile", checkin: "progress" };
-    for (const key of ["me", "workouts", "checkins", "consultations"]) void qc.invalidateQueries({ queryKey: [key] });
+    for (const key of ["me", "dashboard-overview", "workouts", "checkins", "consultations"]) void qc.invalidateQueries({ queryKey: [key] });
     switchSection(destination[type] ?? "overview");
   }
 
@@ -54,6 +68,7 @@ export function ClientApp() {
     queryKey: ["me"],
     queryFn: () => apiFetch<any>("/api/me"),
     enabled: !!session,
+    refetchOnWindowFocus: true,
   });
   const siteQ = useQuery({
     queryKey: ["site"],
@@ -66,7 +81,7 @@ export function ClientApp() {
   const whatsapp = content?.whatsappNumber;
 
   // Onboarding gate
-  if (meQ.isLoading) return <DashboardSkeleton />;
+  if (meQ.isLoading || (!me && !meQ.isError)) return <DashboardSkeleton />;
   if (meQ.isError) return <main className="flex min-h-screen items-center justify-center p-5"><div className="max-w-md space-y-4 rounded-2xl border border-border bg-card p-6"><h1 className="font-display text-2xl">{t("common.error")}</h1><Button onClick={() => meQ.refetch()}>{locale === "ar" ? "عاود المحاولة" : locale === "fr" ? "Réessayer" : "Try again"}</Button><Button variant="outline" onClick={() => signOut({ callbackUrl: "/" })}>{t("nav.logout")}</Button></div></main>;
   if (me && (!me.profile || me.profile.onboarded === false)) {
     return <Onboarding packages={packages} />;
@@ -165,8 +180,8 @@ export function ClientApp() {
               exit={{ opacity: 0 }}
               transition={{ duration: 0.25 }}
             >
-              {section === "overview" && <Overview me={me} whatsapp={whatsapp} />}
-              {section === "workouts" && <Workouts whatsapp={whatsapp} />}
+              {section === "overview" && <ClientOverview me={me} onNavigate={switchSection} />}
+              {section === "workouts" && <Workouts whatsapp={whatsapp} initialDayIndex={workoutDayIndex} />}
               {section === "nutrition" && <Nutrition plan={me?.nutritionPlan} />}
               {section === "progress" && <ProgressSection />}
               {section === "messages" && <Messages />}

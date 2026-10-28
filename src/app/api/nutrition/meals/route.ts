@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/server-utils";
+import { coachingDayRange } from "@/lib/coaching-day";
 
 const schema = z.object({
   mealType: z.enum(["breakfast", "lunch", "dinner", "snack"]),
@@ -18,12 +19,12 @@ export async function GET(req: NextRequest) {
 
   const url = new URL(req.url);
   const dateParam = url.searchParams.get("date");
-  const day = dateParam ? new Date(dateParam) : new Date();
-  const start = new Date(day); start.setHours(0, 0, 0, 0);
-  const end = new Date(day); end.setHours(23, 59, 59, 999);
+  let range;
+  try { range = coachingDayRange(new Date(), dateParam ?? undefined); }
+  catch { return NextResponse.json({ error: "Use a valid date in YYYY-MM-DD format." }, { status: 400 }); }
 
   const meals = await db.mealLog.findMany({
-    where: { userId: session.user.id, date: { gte: start, lte: end } },
+    where: { userId: session.user.id, date: { gte: range.start, lt: range.end } },
     orderBy: { date: "asc" },
   });
   return NextResponse.json({ meals });

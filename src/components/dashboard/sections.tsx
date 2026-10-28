@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { PlanMedia } from "@/components/plan-media";
 import { Conversation } from "@/components/conversation";
 import { AccountSettings } from "@/components/auth/account-settings";
+import { workoutDayName } from "@/lib/dashboard-overview";
+import { overviewCopy } from "./overview-copy";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
@@ -28,120 +30,12 @@ import {
 import { KpiCard, StatusBadge, SectionLoading, EmptyState, MotionCard, formatDate, formatTime } from "./shared";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-/* ============== OVERVIEW ============== */
-export function Overview({ me, whatsapp }: { me: any; whatsapp?: string }) {
-  const { t, locale } = useI18n();
-  const name = me?.user?.name?.split(" ")[0] ?? "athlete";
-  const sub = me?.activeSubscription;
-  const plan = me?.workoutPlan;
-  const nutrition = me?.nutritionPlan;
-  const unread = me?.unreadMessages ?? 0;
-
-  return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="font-display text-2xl font-bold uppercase sm:text-3xl">
-          {t("dashboard.welcome", { name })}
-        </h2>
-        <p className="text-sm text-muted-foreground">{t("dashboard.subtitle")}</p>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard
-          label={t("dashboard.activePackage")}
-          value={sub?.package?.title ?? t("dashboard.noPackage")}
-          icon={Package}
-          hint={sub ? <StatusBadge status={sub.status} /> : undefined as any}
-        />
-        <KpiCard label={t("nav.messages")} value={unread} icon={MessageSquare} />
-        <KpiCard
-          label={t("dashboard.currentPlan")}
-          value={plan?.title ?? t("dashboard.noWorkouts")}
-          icon={Dumbbell}
-        />
-        <KpiCard
-          label={t("dashboard.nutritionTargets")}
-          value={nutrition ? `${nutrition.dailyCalories ?? "—"} kcal` : t("dashboard.noNutrition")}
-          icon={Activity}
-        />
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card className="border-border/50 bg-card/60">
-          <CardHeader className="pb-3">
-            <CardTitle className="font-display text-sm font-bold uppercase tracking-wider">
-              {t("dashboard.currentPlan")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {plan ? (
-              plan.days.map((d: any, i: number) => (
-                <div key={i} className="flex items-center justify-between rounded-lg border border-border/50 bg-card/40 p-3">
-                  <div>
-                    <p className="text-sm font-semibold">{d.day}</p>
-                    <p className="text-xs text-muted-foreground">{d.focus} · {d.exercises?.length ?? 0} exercises</p>
-                  </div>
-                  <Badge variant="outline" className="text-primary">{d.exercises?.length ?? 0}</Badge>
-                </div>
-              ))
-            ) : (
-              <EmptyState title={t("dashboard.noWorkouts")} desc={t("dashboard.noWorkouts")} whatsapp={{ number: whatsapp, message: "Hello! When will my workout program be ready?" }} />
-            )}
-          </CardContent>
-        </Card>
-
-        <Card className="border-border/50 bg-card/60">
-          <CardHeader className="pb-3">
-            <CardTitle className="font-display text-sm font-bold uppercase tracking-wider">
-              {t("dashboard.nutritionTargets")}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {nutrition ? (
-              <div className="space-y-3">
-                <div className="grid grid-cols-3 gap-3 text-center">
-                  <Macro label={t("dashboard.protein")} value={`${nutrition.proteinG}g`} color="text-primary" />
-                  <Macro label={t("dashboard.carbs")} value={`${nutrition.carbsG}g`} color="text-amber-800 dark:text-amber-400" />
-                  <Macro label={t("dashboard.fats")} value={`${nutrition.fatsG}g`} color="text-blue-700 dark:text-blue-400" />
-                </div>
-                {nutrition.meals?.length > 0 && (
-                  <div className="space-y-1.5">
-                    {nutrition.meals.map((m: any, i: number) => (
-                      <div key={i} className="flex gap-2 text-xs">
-                        <span className="font-semibold text-primary">{m.meal}:</span>
-                        <span className="text-muted-foreground">{m.suggestion}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                <p className="text-[10px] text-muted-foreground">
-                  {locale === "fr" ? "Conseils nutritionnels à but éducatif, non un avis médical." : locale === "ar" ? "إرشادات تغذوية تعليمية وليست بديلا عن المشورة الطبية." : "Nutrition guidance is educational and not a substitute for medical advice."}
-                </p>
-              </div>
-            ) : (
-              <EmptyState title={t("dashboard.noNutrition")} desc={t("dashboard.noNutrition")} whatsapp={{ number: whatsapp, message: "Hello! When will my nutrition plan be ready?" }} />
-            )}
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-}
-
-function Macro({ label, value, color }: { label: string; value: string; color: string }) {
-  return (
-    <div className="rounded-lg border border-border/50 bg-card/40 p-2">
-      <p className={`font-display text-lg font-bold ${color}`}>{value}</p>
-      <p className="text-[10px] uppercase text-muted-foreground">{label}</p>
-    </div>
-  );
-}
-
 /* ============== WORKOUTS ============== */
-export function Workouts({ whatsapp }: { whatsapp?: string }) {
-  const { t } = useI18n();
+export function Workouts({ whatsapp, initialDayIndex }: { whatsapp?: string; initialDayIndex?: number }) {
+  const { t, locale } = useI18n();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
+  const selectedSession = useRef<HTMLDivElement>(null);
   const { data, isLoading } = useQuery({
     queryKey: ["workouts"],
     queryFn: () => apiFetch<any>("/api/workouts"),
@@ -149,9 +43,14 @@ export function Workouts({ whatsapp }: { whatsapp?: string }) {
 
   const logMut = useMutation({
     mutationFn: (v: any) => apiFetch("/api/workouts", { json: v }),
-    onSuccess: () => { toast.success("Workout logged"); qc.invalidateQueries({ queryKey: ["workouts"] }); setOpen(false); },
+    onSuccess: () => { toast.success("Workout logged"); qc.invalidateQueries({ queryKey: ["workouts"] }); qc.invalidateQueries({ queryKey: ["dashboard-overview"] }); setOpen(false); },
     onError: (e: any) => toast.error(e.message),
   });
+
+  const planId = data?.plan?.id;
+  useEffect(() => {
+    if (initialDayIndex !== undefined && planId) selectedSession.current?.scrollIntoView({ block: "start", behavior: "auto" });
+  }, [initialDayIndex, planId]);
 
   if (isLoading) return <SectionLoading />;
   const plan = data?.plan;
@@ -159,12 +58,12 @@ export function Workouts({ whatsapp }: { whatsapp?: string }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="font-display text-2xl font-bold uppercase sm:text-3xl">{t("dashboard.workouts")}</h2>
           <p className="text-sm text-muted-foreground">{plan ? plan.title : t("dashboard.noWorkouts")}</p>
         </div>
-        {plan && <Button onClick={() => setOpen(true)} className="bg-primary text-primary-foreground hover:bg-primary/90"><Plus className="mr-1 h-4 w-4" />{t("dashboard.completeWorkout")}</Button>}
+        {!!plan?.days?.length && <Button onClick={() => setOpen(true)} className="bg-primary text-primary-foreground hover:bg-primary/90"><Plus className="mr-1 h-4 w-4" />{t("dashboard.completeWorkout")}</Button>}
       </div>
 
       {plan && <PlanMedia kind="workout" planId={plan.id} />}
@@ -174,12 +73,13 @@ export function Workouts({ whatsapp }: { whatsapp?: string }) {
         <div className="grid gap-4 lg:grid-cols-2">
           {plan.days.map((d: any, i: number) => (
             <MotionCard key={i} delay={i * 0.05}>
-              <Card className="border-border/50 bg-card/60">
+              <Card ref={i === initialDayIndex ? selectedSession : undefined} className={`scroll-mt-24 border-border/50 bg-card/60 ${i === initialDayIndex ? "border-primary/30 ring-1 ring-primary/10" : ""}`}>
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="font-display text-base font-bold uppercase">{d.day}</CardTitle>
+                    <CardTitle className="font-display text-base font-bold uppercase">{workoutDayName(d)}</CardTitle>
                     <Badge variant="outline" className="text-primary">{d.focus}</Badge>
                   </div>
+                  {i === initialDayIndex && <p className="text-[10px] font-medium text-primary">{overviewCopy[locale].selected}</p>}
                 </CardHeader>
                 <CardContent className="space-y-2">
                   {d.exercises?.map((ex: any, idx: number) => (
@@ -214,14 +114,14 @@ export function Workouts({ whatsapp }: { whatsapp?: string }) {
         </div>
       )}
 
-      <LogWorkoutDialog open={open} onOpenChange={setOpen} plan={plan} onSubmit={(v) => logMut.mutate(v)} loading={logMut.isPending} />
+      <LogWorkoutDialog key={`${plan?.id}:${open}`} initialDayIndex={initialDayIndex} open={open} onOpenChange={setOpen} plan={plan} onSubmit={(v) => logMut.mutate(v)} loading={logMut.isPending} />
     </div>
   );
 }
 
-function LogWorkoutDialog({ open, onOpenChange, plan, onSubmit, loading }: any) {
+function LogWorkoutDialog({ open, onOpenChange, plan, onSubmit, loading, initialDayIndex = 0 }: any) {
   const { t } = useI18n();
-  const [dayIdx, setDayIdx] = useState(0);
+  const [dayIdx, setDayIdx] = useState(Math.max(0, Math.min(initialDayIndex, (plan?.days?.length ?? 1) - 1)));
   const [duration, setDuration] = useState(45);
   const [notes, setNotes] = useState("");
   if (!plan) return null;
@@ -241,7 +141,7 @@ function LogWorkoutDialog({ open, onOpenChange, plan, onSubmit, loading }: any) 
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
                 {plan.days.map((d: any, i: number) => (
-                  <SelectItem key={i} value={String(i)}>{d.day} · {d.focus}</SelectItem>
+                  <SelectItem key={i} value={String(i)}>{workoutDayName(d)}{d.focus ? ` · ${d.focus}` : ""}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
@@ -295,16 +195,16 @@ export function Nutrition({ plan }: { plan: any }) {
 
   const mealMut = useMutation({
     mutationFn: (v: any) => apiFetch("/api/nutrition/meals", { json: v }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["meals"] }); setOpen(false); toast.success("Meal logged"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["meals"] }); qc.invalidateQueries({ queryKey: ["dashboard-overview"] }); setOpen(false); toast.success("Meal logged"); },
     onError: (e: any) => toast.error(e.message),
   });
   const waterMut = useMutation({
     mutationFn: (cups: number) => apiFetch("/api/nutrition/water", { json: { cups } }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["water"] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["water"] }); qc.invalidateQueries({ queryKey: ["dashboard-overview"] }); },
   });
   const delMut = useMutation({
     mutationFn: (id: string) => apiFetch(`/api/nutrition/meals?id=${id}`, { method: "DELETE" }),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ["meals"] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["meals"] }); qc.invalidateQueries({ queryKey: ["dashboard-overview"] }); },
   });
 
   if (!plan) return (
@@ -445,7 +345,7 @@ export function ProgressSection() {
   });
   const checkinMut = useMutation({
     mutationFn: (v: any) => apiFetch("/api/checkins", { json: v }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["checkins"] }); setCheckinOpen(false); toast.success("Check-in submitted"); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ["checkins"] }); qc.invalidateQueries({ queryKey: ["dashboard-overview"] }); setCheckinOpen(false); toast.success("Check-in submitted"); },
     onError: (e: any) => toast.error(e.message),
   });
 
@@ -466,7 +366,6 @@ export function ProgressSection() {
             {photosQ.isLoading ? <SectionLoading /> : photosQ.data?.photos?.length ? (
               <div className="grid grid-cols-3 gap-2">
                 {photosQ.data.photos.map((p: any) => (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img key={p.id} src={p.url} alt={p.type} className="aspect-[3/4] w-full rounded-lg border border-border/50 object-cover" />
                 ))}
               </div>

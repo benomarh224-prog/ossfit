@@ -28,9 +28,12 @@ export function Conversation({ clientId }: { clientId?: string }) {
   const unique = [...new Map(messages.map(m => [m.id, m])).values()];
   const latestId = unique.at(-1)?.id;
   useEffect(() => { if (nearBottom.current && scroller.current) scroller.current.scrollTop = scroller.current.scrollHeight; }, [latestId]);
+  useEffect(() => {
+    if (query.dataUpdatedAt) void qc.invalidateQueries({ queryKey: clientId ? ["admin", "message-threads"] : ["me"] });
+  }, [clientId, qc, query.dataUpdatedAt]);
   const send = useMutation({ mutationFn: (body: string) => apiFetch("/api/messages", { json: { body, ...(clientId ? { clientId } : {}) } }), onSuccess: () => {
     setText(""); nearBottom.current = true;
-    void qc.invalidateQueries({ queryKey: key }); void qc.invalidateQueries({ queryKey: ["admin", "message-threads"] }); void qc.invalidateQueries({ queryKey: ["notifications"] }); void qc.invalidateQueries({ queryKey: ["me"] });
+    void qc.invalidateQueries({ queryKey: key }); void qc.invalidateQueries({ queryKey: ["admin", "message-threads"] }); void qc.invalidateQueries({ queryKey: ["notifications"] }); void qc.invalidateQueries({ queryKey: ["me"] }); void qc.invalidateQueries({ queryKey: ["dashboard-overview"] });
   } });
   return <div className="flex h-[min(65dvh,38rem)] min-h-80 min-w-0 flex-col overflow-hidden rounded-xl border border-border bg-card">
     <div ref={scroller} onScroll={e => { const el = e.currentTarget; nearBottom.current = el.scrollHeight - el.scrollTop - el.clientHeight < 100; }} className="min-h-0 flex-1 space-y-3 overflow-y-auto overscroll-contain p-3 sm:p-4" role="log" aria-label={c.input}>

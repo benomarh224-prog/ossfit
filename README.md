@@ -32,6 +32,8 @@ npm run dev
 
 ## Coaching workflow
 
+The client home screen prioritizes the next action, the next session in the assigned plan, today's meal/water totals, and the latest coach message or check-in feedback. Shortcuts open the actual dashboard sections; the session shortcut highlights and selects the suggested day in the workout logger. Session suggestions use the previous log for the current plan and preserve the coach's rest-day instructions; the application does not invent calendar training dates. Missing targets and unavailable daily data show explicit empty/loading/error states. Today's totals and meal/water lists use `Africa/Casablanca` calendar boundaries, including offset changes. Overview reads do not mark private messages as read. Recording a workout, meal, water or check-in invalidates the overview; it also refreshes on focus and the next coaching midnight.
+
 The **Messages** section lets the coach read and answer each client's private conversation. Clients see the same conversation in their dashboard. Messages are bounded to 4,000 characters, sent transactionally with notifications, and paged in groups of 50. The active conversation refreshes every 30 seconds while the page is visible. The notification bell displays the latest 30 notices, refreshes on opening/focus and supports marking only displayed notices as read.
 
 In a client profile the coach can review the latest 20 weekly check-ins, write feedback and see the latest 12 private progress photos. Check-in feedback rejects stale concurrent edits and notifies the client. Additional history remains stored; the coach preview intentionally shows only the latest items.

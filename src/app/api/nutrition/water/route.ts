@@ -1,16 +1,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/server-utils";
+import { coachingDayRange } from "@/lib/coaching-day";
 
 // GET today's water cups count
 export async function GET() {
   const session = await requireAuth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const start = new Date(); start.setHours(0, 0, 0, 0);
-  const end = new Date(); end.setHours(23, 59, 59, 999);
+  const { start, end } = coachingDayRange();
   const logs = await db.waterLog.findMany({
-    where: { userId: session.user.id, date: { gte: start, lte: end } },
+    where: { userId: session.user.id, date: { gte: start, lt: end } },
   });
   const cups = logs.reduce((sum, l) => sum + l.cups, 0);
   return NextResponse.json({ cups, logs });
