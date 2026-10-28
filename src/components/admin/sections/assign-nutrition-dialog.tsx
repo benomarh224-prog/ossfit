@@ -2,6 +2,7 @@
 
 import { PlanMedia } from "@/components/plan-media";
 import { DialogBackButton } from "../dialog-back-button";
+import { useI18n } from "@/lib/i18n/i18n-provider";
 
 import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -27,19 +28,22 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { apiFetch, type AdminClient } from "../lib";
+import { apiFetch, type AdminClient, type AdminNutritionPlan } from "../lib";
 
 export function CreateNutritionDialog({
   open,
   onOpenChange,
   presetUserId,
   clients,
+  plan,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   presetUserId?: string | null;
   clients?: AdminClient[];
+  plan?: AdminNutritionPlan | null;
 }) {
+  const { t, locale } = useI18n();
   const qc = useQueryClient();
   const [createdPlan, setCreatedPlan] = React.useState<string | null>(null);
   React.useEffect(() => { if (!open) setCreatedPlan(null); }, [open]);
@@ -63,40 +67,49 @@ export function CreateNutritionDialog({
   });
 
   React.useEffect(() => {
-    if (presetUserId) setUserId(presetUserId);
-  }, [presetUserId]);
+    if (!open) return;
+    setCreatedPlan(null);
+    if (!plan) { reset(); return; }
+    setUserId(plan.userId ?? ""); setTitle(plan.title); setActive(plan.active);
+    setDailyCalories(plan.dailyCalories ?? ""); setProteinG(plan.proteinG ?? "");
+    setCarbsG(plan.carbsG ?? ""); setFatsG(plan.fatsG ?? "");
+    setWaterCupsGoal(plan.waterCupsGoal); setNotes(plan.notes ?? "");
+    setMeals(plan.meals.map((meal) => ({ name: meal.name, suggestion: meal.suggestion ?? "" })));
+  }, [open, plan, presetUserId]);
 
   const allClients = clients ?? clientsQ.data?.clients ?? [];
 
   const createMut = useMutation({
     mutationFn: () => {
       const payload = {
-        userId,
+        ...(plan ? { expectedUpdatedAt: plan.updatedAt } : { userId }),
         title,
-        dailyCalories: dailyCalories === "" ? undefined : Number(dailyCalories),
-        proteinG: proteinG === "" ? undefined : Number(proteinG),
-        carbsG: carbsG === "" ? undefined : Number(carbsG),
-        fatsG: fatsG === "" ? undefined : Number(fatsG),
+        dailyCalories: dailyCalories === "" ? (plan ? null : undefined) : Number(dailyCalories),
+        proteinG: proteinG === "" ? (plan ? null : undefined) : Number(proteinG),
+        carbsG: carbsG === "" ? (plan ? null : undefined) : Number(carbsG),
+        fatsG: fatsG === "" ? (plan ? null : undefined) : Number(fatsG),
         waterCupsGoal: waterCupsGoal === "" ? undefined : Number(waterCupsGoal),
-        notes: notes || undefined,
+        notes: notes || (plan ? null : undefined),
         active,
         meals: meals.map((m) => ({
           name: m.name,
           suggestion: m.suggestion || undefined,
         })),
       };
-      return apiFetch<{ plan: { id: string } }>("/api/admin/nutrition", {
-        method: "POST",
+      return apiFetch<{ plan: { id: string } }>(plan ? `/api/admin/nutrition/${plan.id}` : "/api/admin/nutrition", {
+        method: plan ? "PATCH" : "POST",
         body: JSON.stringify(payload),
       });
     },
     onSuccess: (data: { plan: { id: string } }) => {
-      toast.success("Nutrition plan assigned");
+      toast.success(plan ? (locale === "ar" ? "تحدّث البرنامج" : locale === "fr" ? "Programme mis à jour" : "Plan updated") : "Nutrition plan assigned");
       qc.invalidateQueries({ queryKey: ["admin", "nutrition"] });
+      qc.invalidateQueries({ queryKey: ["me"] });
+      if (plan) { onOpenChange(false); return; }
       setCreatedPlan(data.plan.id);
       reset();
     },
-    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e: unknown) => { toast.error(e instanceof Error ? e.message : "Failed"); if (plan) qc.invalidateQueries({ queryKey: ["admin", "nutrition"] }); },
   });
 
   function reset() {
@@ -109,31 +122,31 @@ export function CreateNutritionDialog({
     setNotes("");
     setActive(true);
     setMeals([{ name: "Breakfast", suggestion: "" }]);
-    if (!presetUserId) setUserId("");
+    setUserId(presetUserId ?? "");
   }
 
-  const canSave = !!userId && !!title.trim() && !createMut.isPending;
+  const canSave = (!!plan || !!userId) && title.trim().length >= 2 && !createMut.isPending;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(value) => { if (!createMut.isPending) onOpenChange(value); }}>
       <DialogContent showCloseButton={false} className="max-h-[85dvh] sm:max-h-[90dvh] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-w-3xl">
         {createdPlan ? <>
-          <DialogHeader className="border-b border-border px-4 py-2 text-start"><div className="flex items-center gap-2"><DialogBackButton onBack={() => onOpenChange(false)} /><DialogTitle className="font-display text-lg">Photos &amp; videos</DialogTitle></div><DialogDescription className="pb-2">Plan saved. Add private guidance for the trainee.</DialogDescription></DialogHeader>
+          <DialogHeader className="border-b border-border px-4 py-2 text-start"><div className="flex items-center gap-2"><DialogBackButton disabled={createMut.isPending} onBack={() => onOpenChange(false)} /><DialogTitle className="font-display text-lg">Photos &amp; videos</DialogTitle></div><DialogDescription className="pb-2">Plan saved. Add private guidance for the trainee.</DialogDescription></DialogHeader>
           <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain p-4"><PlanMedia kind="nutrition" planId={createdPlan} manage /></div>
           <DialogFooter className="border-t border-border bg-background p-3"><Button className="min-h-11" onClick={() => onOpenChange(false)}>Done</Button></DialogFooter>
         </> : <>
         <DialogHeader className="border-b border-border px-4 py-2 text-start">
-          <div className="flex items-center gap-2"><DialogBackButton onBack={() => onOpenChange(false)} /><DialogTitle className="min-w-0 font-display text-lg">Create nutrition plan</DialogTitle></div>
+          <div className="flex items-center gap-2"><DialogBackButton disabled={createMut.isPending} onBack={() => onOpenChange(false)} /><DialogTitle className="min-w-0 font-display text-lg">{plan ? `${t("actions.edit")} · ${t("admin.nutrition")}` : "Create nutrition plan"}</DialogTitle></div>
           <DialogDescription>
             Daily targets and meal suggestions for the client.
           </DialogDescription>
         </DialogHeader>
-        <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain p-4">
+        <fieldset disabled={createMut.isPending} className="min-h-0 min-w-0 space-y-4 overflow-y-auto overscroll-contain p-4">
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label>Client</Label>
-            <Select value={userId} onValueChange={setUserId} disabled={!!presetUserId}>
+            <Select value={userId} onValueChange={setUserId} disabled={!!presetUserId || !!plan}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a client" />
               </SelectTrigger>
@@ -261,14 +274,14 @@ export function CreateNutritionDialog({
           />
         </div>
 
-        </div>
+        </fieldset>
         <DialogFooter className="border-t border-border bg-background p-3 [&_button]:min-h-11">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" disabled={createMut.isPending} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button onClick={() => createMut.mutate()} disabled={!canSave}>
             {createMut.isPending && <Loader2 className="size-4 animate-spin" />}
-            Save plan
+            {plan ? t("actions.save") : "Save plan"}
           </Button>
         </DialogFooter>
         </>}

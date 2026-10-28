@@ -37,6 +37,8 @@ Workout and nutrition plans support separate **private photo/video attachments**
 
 Dialogs use the available viewport height. The client profile and plan editors keep their Back button and actions outside the scrolling content on phones.
 
+The coach can choose **Edit** on workout and nutrition plans to update their content and active status. Editing preserves the existing plan ID, assigned trainee, attachments and past logs. The trainee field is locked during editing. Activating a plan deactivates other plans of the same kind for that trainee; writes are transactional and concurrent stale edits are rejected with a request to reopen the editor.
+
 Bank account fields are omitted from anonymous page data. Registration and sign-in are rate limited through PostgreSQL. Prices and payment ownership are checked on the server.
 
 ## Checks

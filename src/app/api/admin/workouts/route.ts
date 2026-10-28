@@ -1,16 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { z } from "zod";
+import { workoutCreateSchema as schema, lockPlanClient, PlanEditError } from "@/lib/plan-editor";
 import { db } from "@/lib/db";
 import { requireCoach, toJSON, parseJSON } from "@/lib/server-utils";
-
-const schema = z.object({
-  userId: z.string(),
-  title: z.string().min(2),
-  goal: z.string().optional(),
-  summary: z.string().optional(),
-  days: z.array(z.any()),
-  active: z.boolean().default(true),
-});
 
 export async function GET() {
   const session = await requireCoach();
@@ -34,27 +25,16 @@ export async function POST(req: NextRequest) {
   const parsed = schema.safeParse(body);
   if (!parsed.success) return NextResponse.json({ error: parsed.error.issues[0]?.message }, { status: 400 });
   const d = parsed.data;
-  // deactivate other active plans for this user
-  if (d.active) {
-    await db.workoutPlan.updateMany({ where: { userId: d.userId, active: true }, data: { active: false } });
+  try {
+    const created = await db.$transaction(async (tx) => {
+      await lockPlanClient(tx, d.userId);
+      if (d.active) await tx.workoutPlan.updateMany({ where: { userId: d.userId, active: true }, data: { active: false } });
+      const plan = await tx.workoutPlan.create({ data: { userId: d.userId, title: d.title, goal: d.goal, summary: d.summary, daysJson: toJSON(d.days), active: d.active } });
+      await tx.notification.create({ data: { userId: d.userId, title: "New workout plan assigned", body: d.title, type: "workout" } });
+      return plan;
+    });
+    return NextResponse.json({ ok: true, plan: { ...created, days: parseJSON(created.daysJson, []) } });
+  } catch (error) {
+    return NextResponse.json({ error: error instanceof PlanEditError ? error.message : "Unable to save the plan. Please retry." }, { status: error instanceof PlanEditError ? error.status : 503 });
   }
-  const created = await db.workoutPlan.create({
-    data: {
-      userId: d.userId,
-      title: d.title,
-      goal: d.goal,
-      summary: d.summary,
-      daysJson: toJSON(d.days),
-      active: d.active,
-    },
-  });
-  await db.notification.create({
-    data: {
-      userId: d.userId,
-      title: "New workout plan assigned",
-      body: d.title,
-      type: "workout",
-    },
-  });
-  return NextResponse.json({ ok: true, plan: { ...created, days: parseJSON(created.daysJson, []) } });
 }

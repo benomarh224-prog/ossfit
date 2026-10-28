@@ -4,7 +4,7 @@ import { PlanMedia } from "@/components/plan-media";
 
 import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Plus, Trash2, Loader2, Dumbbell } from "lucide-react";
+import { Plus, Trash2, Loader2, Pencil, Dumbbell } from "lucide-react";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -30,6 +30,7 @@ export default function WorkoutsSection() {
   const { t } = useI18n();
   const qc = useQueryClient();
   const [createOpen, setCreateOpen] = React.useState(false);
+  const [editingPlan, setEditingPlan] = React.useState<AdminWorkoutPlan | null>(null);
   const [expanded, setExpanded] = React.useState<Record<string, boolean>>({});
 
   const { data, isLoading, isError, refetch } = useQuery<{ plans: AdminWorkoutPlan[] }>({
@@ -92,12 +93,13 @@ export default function WorkoutsSection() {
                       </CardDescription>
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     {p.active && (
                       <Badge variant="outline" className="border-primary/40 bg-primary/10 text-primary">
                         Active
                       </Badge>
                     )}
+                    <Button variant="outline" size="sm" className="min-h-11" onClick={() => setEditingPlan(p)}><Pencil className="size-4" />{t("actions.edit")}</Button>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -200,7 +202,7 @@ export default function WorkoutsSection() {
         </div>
       )}
 
-      <CreateWorkoutDialog open={createOpen} onOpenChange={setCreateOpen} />
+      <CreateWorkoutDialog open={createOpen || !!editingPlan} plan={editingPlan} onOpenChange={(value) => { if (!value) { setCreateOpen(false); setEditingPlan(null); } }} />
     </SectionShell>
   );
 }

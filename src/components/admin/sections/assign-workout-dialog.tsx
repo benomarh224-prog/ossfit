@@ -2,6 +2,7 @@
 
 import { PlanMedia } from "@/components/plan-media";
 import { DialogBackButton } from "../dialog-back-button";
+import { useI18n } from "@/lib/i18n/i18n-provider";
 
 import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -27,7 +28,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
-import { apiFetch, type AdminClient, type WorkoutDay, type WorkoutExercise, type AdminExerciseLib } from "../lib";
+import { apiFetch, type AdminClient, type WorkoutDay, type WorkoutExercise, type AdminExerciseLib, type AdminWorkoutPlan } from "../lib";
 
 interface DayDraft {
   id: string;
@@ -45,12 +46,15 @@ export function CreateWorkoutDialog({
   onOpenChange,
   presetUserId,
   clients,
+  plan,
 }: {
   open: boolean;
   onOpenChange: (v: boolean) => void;
   presetUserId?: string | null;
   clients?: AdminClient[];
+  plan?: AdminWorkoutPlan | null;
 }) {
+  const { t, locale } = useI18n();
   const qc = useQueryClient();
   const [createdPlan, setCreatedPlan] = React.useState<string | null>(null);
   React.useEffect(() => { if (!open) setCreatedPlan(null); }, [open]);
@@ -72,8 +76,13 @@ export function CreateWorkoutDialog({
   });
 
   React.useEffect(() => {
-    if (presetUserId) setUserId(presetUserId);
-  }, [presetUserId]);
+    if (!open) return;
+    setCreatedPlan(null);
+    if (!plan) { reset(); return; }
+    setUserId(plan.userId ?? ""); setTitle(plan.title); setGoal(plan.goal ?? "");
+    setSummary(plan.summary ?? ""); setActive(plan.active);
+    setDays(plan.days.map((day) => ({ id: crypto.randomUUID(), name: day.name, focus: day.focus ?? "", exercises: (day.exercises ?? []).map((ex) => ({ id: crypto.randomUUID(), name: ex.name, sets: ex.sets ?? "", reps: ex.reps ?? "", rest: ex.rest ?? "" })) })));
+  }, [open, plan, presetUserId]);
 
   const allClients = clients ?? clientsQ.data?.clients ?? [];
   const lib = libQ.data?.library ?? [];
@@ -81,10 +90,10 @@ export function CreateWorkoutDialog({
   const createMut = useMutation({
     mutationFn: () => {
       const payload = {
-        userId,
+        ...(plan ? { expectedUpdatedAt: plan.updatedAt } : { userId }),
         title,
-        goal: goal || undefined,
-        summary: summary || undefined,
+        goal: goal || (plan ? null : undefined),
+        summary: summary || (plan ? null : undefined),
         active,
         days: days.map((d) => ({
           name: d.name,
@@ -97,18 +106,21 @@ export function CreateWorkoutDialog({
           })),
         })),
       };
-      return apiFetch<{ plan: { id: string } }>("/api/admin/workouts", {
-        method: "POST",
+      return apiFetch<{ plan: { id: string } }>(plan ? `/api/admin/workouts/${plan.id}` : "/api/admin/workouts", {
+        method: plan ? "PATCH" : "POST",
         body: JSON.stringify(payload),
       });
     },
     onSuccess: (data: { plan: { id: string } }) => {
-      toast.success("Workout plan assigned");
+      toast.success(plan ? (locale === "ar" ? "تحدّث البرنامج" : locale === "fr" ? "Programme mis à jour" : "Plan updated") : "Workout plan assigned");
       qc.invalidateQueries({ queryKey: ["admin", "workouts"] });
+      qc.invalidateQueries({ queryKey: ["workouts"] });
+      qc.invalidateQueries({ queryKey: ["me"] });
+      if (plan) { onOpenChange(false); return; }
       setCreatedPlan(data.plan.id);
       reset();
     },
-    onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Failed"),
+    onError: (e: unknown) => { toast.error(e instanceof Error ? e.message : "Failed"); if (plan) qc.invalidateQueries({ queryKey: ["admin", "workouts"] }); },
   });
 
   function reset() {
@@ -117,7 +129,7 @@ export function CreateWorkoutDialog({
     setSummary("");
     setActive(true);
     setDays([newDay()]);
-    if (!presetUserId) setUserId("");
+    setUserId(presetUserId ?? "");
   }
 
   function updateDay(id: string, patch: Partial<DayDraft>) {
@@ -161,28 +173,28 @@ export function CreateWorkoutDialog({
     );
   }
 
-  const canSave = !!userId && !!title.trim() && !createMut.isPending;
+  const canSave = (!!plan || !!userId) && title.trim().length >= 2 && !createMut.isPending;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(value) => { if (!createMut.isPending) onOpenChange(value); }}>
       <DialogContent showCloseButton={false} className="max-h-[85dvh] sm:max-h-[90dvh] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-w-3xl">
         {createdPlan ? <>
-          <DialogHeader className="border-b border-border px-4 py-2 text-start"><div className="flex items-center gap-2"><DialogBackButton onBack={() => onOpenChange(false)} /><DialogTitle className="font-display text-lg">Photos &amp; videos</DialogTitle></div><DialogDescription className="pb-2">Plan saved. Add private guidance for the trainee.</DialogDescription></DialogHeader>
+          <DialogHeader className="border-b border-border px-4 py-2 text-start"><div className="flex items-center gap-2"><DialogBackButton disabled={createMut.isPending} onBack={() => onOpenChange(false)} /><DialogTitle className="font-display text-lg">Photos &amp; videos</DialogTitle></div><DialogDescription className="pb-2">Plan saved. Add private guidance for the trainee.</DialogDescription></DialogHeader>
           <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain p-4"><PlanMedia kind="workout" planId={createdPlan} manage /></div>
           <DialogFooter className="border-t border-border bg-background p-3"><Button className="min-h-11" onClick={() => onOpenChange(false)}>Done</Button></DialogFooter>
         </> : <>
         <DialogHeader className="border-b border-border px-4 py-2 text-start">
-          <div className="flex items-center gap-2"><DialogBackButton onBack={() => onOpenChange(false)} /><DialogTitle className="min-w-0 font-display text-lg">Create workout plan</DialogTitle></div>
+          <div className="flex items-center gap-2"><DialogBackButton disabled={createMut.isPending} onBack={() => onOpenChange(false)} /><DialogTitle className="min-w-0 font-display text-lg">{plan ? `${t("actions.edit")} · ${t("admin.workouts")}` : "Create workout plan"}</DialogTitle></div>
           <DialogDescription>
             Build a personalized weekly plan with exercises from the library.
           </DialogDescription>
         </DialogHeader>
-        <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain p-4">
+        <fieldset disabled={createMut.isPending} className="min-h-0 min-w-0 space-y-4 overflow-y-auto overscroll-contain p-4">
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
             <Label>Client</Label>
-            <Select value={userId} onValueChange={setUserId} disabled={!!presetUserId}>
+            <Select value={userId} onValueChange={setUserId} disabled={!!presetUserId || !!plan}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select a client" />
               </SelectTrigger>
@@ -316,14 +328,14 @@ export function CreateWorkoutDialog({
           ))}
         </div>
 
-        </div>
+        </fieldset>
         <DialogFooter className="border-t border-border bg-background p-3 [&_button]:min-h-11">
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button variant="outline" disabled={createMut.isPending} onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
           <Button onClick={() => createMut.mutate()} disabled={!canSave}>
             {createMut.isPending && <Loader2 className="size-4 animate-spin" />}
-            Save plan
+            {plan ? t("actions.save") : "Save plan"}
           </Button>
         </DialogFooter>
         </>}
