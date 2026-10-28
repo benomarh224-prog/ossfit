@@ -196,7 +196,7 @@ function SidebarBody({
 
 export function AdminApp() {
   const { data: session, status } = useSession();
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [section, setSection] = React.useState<AdminSection>("overview");
   const [mobileOpen, setMobileOpen] = React.useState(false);
 
@@ -220,7 +220,7 @@ export function AdminApp() {
 
         {/* Mobile sidebar (Sheet) — trigger is a plain button in the topbar */}
         <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-          <SheetContent side="left" className="w-72 p-0 lg:hidden">
+          <SheetContent side={locale === "ar" ? "right" : "left"} className="w-72 p-0 lg:hidden">
             <SheetTitle className="sr-only">Admin navigation</SheetTitle>
             <SheetDescription className="sr-only">
               Navigate between admin sections
@@ -232,24 +232,27 @@ export function AdminApp() {
         {/* Main column */}
         <div className="flex min-w-0 flex-1 flex-col">
           {/* Top bar */}
-          <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b border-border/60 bg-background/80 px-4 backdrop-blur sm:px-6">
+          <header className="sticky top-0 z-30 flex h-[4.5rem] items-center gap-2 border-b border-border/60 bg-background/95 px-3 backdrop-blur-xl sm:h-16 sm:gap-3 sm:px-6">
             <Button
               variant="ghost"
               size="icon"
-              className="lg:hidden"
-              aria-label="Open navigation"
+              className="size-11 shrink-0 rounded-xl lg:hidden"
+              aria-label={locale === "ar" ? "فتح القائمة" : locale === "fr" ? "Ouvrir le menu" : "Open navigation"}
               onClick={() => setMobileOpen(true)}
             >
               <Menu className="size-5" />
             </Button>
             <div className="min-w-0 flex-1">
-              <h1 className="truncate font-display text-lg tracking-wide text-foreground sm:text-xl">
+              <p className="mb-0.5 truncate text-[8px] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:hidden">Coach Oussama</p>
+              <h1 className="truncate font-display text-[17px] leading-tight text-foreground sm:text-xl">
                 {activeItem?.label ?? t("admin.overview")}
               </h1>
             </div>
-            <Notifications onNavigate={type => { const map: Record<string, AdminSection> = { message: "messages", payment: "payments", checkin: "clients", security: "account", consultation: "consultations" }; switchSection(map[type] ?? "overview"); }} />
-            <ThemeSwitcher />
-            <LanguageSwitcher compact />
+            <div className="flex shrink-0 items-center gap-0.5 rounded-2xl border border-border/70 bg-card/80 p-0.5 [&_button]:rounded-xl [&_button]:border-0 [&_button]:bg-transparent [&_button]:shadow-none">
+              <Notifications onNavigate={type => { const map: Record<string, AdminSection> = { message: "messages", payment: "payments", checkin: "clients", security: "account", consultation: "consultations" }; switchSection(map[type] ?? "overview"); }} />
+              <ThemeSwitcher />
+              <LanguageSwitcher compact />
+            </div>
             <div className="hidden items-center gap-2 sm:flex">
               <Button asChild variant="outline" size="sm">
                 <a href="/?view=site" target="_blank" rel="noopener noreferrer">
@@ -258,7 +261,7 @@ export function AdminApp() {
                 </a>
               </Button>
             </div>
-            <div className="flex items-center gap-2 rounded-lg border border-border/60 bg-card/60 px-3 py-1.5">
+            <div className="hidden items-center gap-2 rounded-lg border border-border/60 bg-card/60 px-3 py-1.5 sm:flex">
               <div className="flex size-7 items-center justify-center rounded-full bg-primary/15 text-xs font-semibold text-primary">
                 {userName.slice(0, 1).toUpperCase()}
               </div>
@@ -276,7 +279,7 @@ export function AdminApp() {
           </header>
 
           {/* Section content */}
-          <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+          <main className="flex-1 px-4 py-5 sm:px-6 sm:py-6 lg:px-8">
             {status === "loading" ? (
               <div className="space-y-4">
                 <Skeleton className="h-8 w-64" />
