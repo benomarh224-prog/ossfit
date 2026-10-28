@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { signOut, useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, Dumbbell, Salad, TrendingUp, MessageSquare,
@@ -14,7 +14,8 @@ import { apiFetch } from "@/lib/client-utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetTrigger, SheetClose, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Notifications } from "@/components/notifications";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Onboarding } from "@/components/auth/onboarding";
 import {
@@ -37,10 +38,17 @@ const NAV: { id: Section; icon: any; key: string }[] = [
 ];
 
 export function ClientApp() {
-  const { t } = useI18n();
-  const router = useRouter();
+  const { t, locale } = useI18n();
+  const qc = useQueryClient();
   const { data: session } = useSession();
   const [section, setSection] = useState<Section>("overview");
+  const [mobileOpen, setMobileOpen] = useState(false);
+  function switchSection(value: Section) { setSection(value); setMobileOpen(false); }
+  function openNotification(type: string) {
+    const destination: Record<string, Section> = { message: "messages", workout: "workouts", nutrition: "nutrition", payment: "subscription", success: "subscription", warning: "subscription", consultation: "consultations", security: "profile", checkin: "progress" };
+    for (const key of ["me", "workouts", "checkins", "consultations"]) void qc.invalidateQueries({ queryKey: [key] });
+    switchSection(destination[type] ?? "overview");
+  }
 
   const meQ = useQuery({
     queryKey: ["me"],
@@ -59,6 +67,7 @@ export function ClientApp() {
 
   // Onboarding gate
   if (meQ.isLoading) return <DashboardSkeleton />;
+  if (meQ.isError) return <main className="flex min-h-screen items-center justify-center p-5"><div className="max-w-md space-y-4 rounded-2xl border border-border bg-card p-6"><h1 className="font-display text-2xl">{t("common.error")}</h1><Button onClick={() => meQ.refetch()}>{locale === "ar" ? "عاود المحاولة" : locale === "fr" ? "Réessayer" : "Try again"}</Button><Button variant="outline" onClick={() => signOut({ callbackUrl: "/" })}>{t("nav.logout")}</Button></div></main>;
   if (me && (!me.profile || me.profile.onboarded === false)) {
     return <Onboarding packages={packages} />;
   }
@@ -66,11 +75,12 @@ export function ClientApp() {
   const initials = (me?.user?.name || "C").split(" ").map((p: string) => p[0]).slice(0, 2).join("").toUpperCase();
 
   const NavContent = (
-    <nav className="flex flex-1 flex-col gap-1 p-3">
+    <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
       {NAV.map((n) => (
         <button
           key={n.id}
-          onClick={() => setSection(n.id)}
+          onClick={() => switchSection(n.id)}
+          aria-current={section === n.id ? "page" : undefined}
           className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition ${
             section === n.id
               ? "bg-primary text-primary-foreground"
@@ -85,6 +95,7 @@ export function ClientApp() {
         </button>
       ))}
       <div className="mt-auto pt-3">
+        <Button asChild variant="ghost" size="sm" className="min-h-11 w-full justify-start text-foreground/60"><a href="/?view=site">{locale === "ar" ? "الرجوع للموقع الرئيسي" : locale === "fr" ? "Retour au site" : "Back to website"}</a></Button>
         <Button variant="ghost" size="sm" className="w-full justify-start text-foreground/60" onClick={() => signOut({ callbackUrl: "/" })}>
           <LogOut className="mr-2 h-4 w-4" />
           {t("nav.logout")}
@@ -107,10 +118,11 @@ export function ClientApp() {
               <Badge variant="outline" className="mt-0.5 text-[10px] uppercase text-primary">{t("nav.dashboard")}</Badge>
             </div>
           </div>
-          <div className="flex shrink-0 items-center gap-2">
+          <div className="flex shrink-0 items-center gap-0 sm:gap-2">
+            <Notifications onNavigate={openNotification} />
             <ThemeSwitcher />
             <LanguageSwitcher compact />
-            <Avatar className="h-8 w-8 border border-border">
+            <Avatar className="hidden h-8 w-8 border border-border sm:flex">
               <AvatarFallback className="bg-primary/15 text-xs text-primary">{initials}</AvatarFallback>
             </Avatar>
             <span className="hidden text-sm font-medium sm:inline">{me?.user?.name}</span>
@@ -126,16 +138,17 @@ export function ClientApp() {
 
         {/* Mobile sidebar */}
         <div className="lg:hidden">
-          <Sheet>
+          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="fixed bottom-4 right-4 z-40 rounded-full bg-primary text-primary-foreground shadow-lg lg:hidden" aria-label="Menu">
+              <Button variant="ghost" size="icon" className="fixed bottom-[max(1rem,env(safe-area-inset-bottom))] end-4 z-40 size-12 rounded-full bg-primary text-primary-foreground shadow-lg lg:hidden" aria-label={locale === "ar" ? "فتح القائمة" : locale === "fr" ? "Ouvrir le menu" : "Open menu"}>
                 <Menu className="h-5 w-5" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left" className="w-64 p-0">
+            <SheetContent side={locale === "ar" ? "right" : "left"} showCloseButton={false} className="w-[min(19rem,88vw)] gap-0 p-0">
+              <SheetTitle className="sr-only">{t("nav.dashboard")}</SheetTitle><SheetDescription className="sr-only">{t("nav.dashboard")}</SheetDescription>
               <div className="flex items-center justify-between border-b border-border/50 p-3">
-                <span className="font-display font-bold uppercase">Menu</span>
-                <SheetClose asChild><Button variant="ghost" size="icon"><X className="h-4 w-4" /></Button></SheetClose>
+                <span className="font-display font-bold uppercase">{t("nav.dashboard")}</span>
+                <SheetClose asChild><Button variant="ghost" size="icon" className="size-11" aria-label={locale === "ar" ? "إغلاق القائمة" : locale === "fr" ? "Fermer le menu" : "Close menu"}><X className="h-4 w-4" /></Button></SheetClose>
               </div>
               {NavContent}
             </SheetContent>
@@ -143,7 +156,7 @@ export function ClientApp() {
         </div>
 
         {/* Main */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">
+        <main className="min-w-0 flex-1 p-4 pb-24 sm:p-6 sm:pb-24 lg:p-8">
           <AnimatePresence mode="wait">
             <motion.div
               key={section}

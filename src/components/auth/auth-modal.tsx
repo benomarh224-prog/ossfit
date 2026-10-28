@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { recoveryCopy } from "./recovery-copy";
 import { getSession, signIn } from "next-auth/react";
 import { signedInDestination } from "@/lib/login-access";
 import { useForm } from "react-hook-form";
@@ -52,7 +54,7 @@ export function AuthModal({
   onOpenChange: (v: boolean) => void;
   defaultTab?: "login" | "register";
 }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState(defaultTab);
   useEffect(() => { if (open) setTab(defaultTab); }, [open, defaultTab]);
@@ -167,6 +169,7 @@ export function AuthModal({
                     {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                     {t("auth.login")}
                   </Button>
+                  <Link href="/reset-password" className="flex min-h-11 items-center justify-center text-sm font-medium text-primary hover:underline">{recoveryCopy[locale].forgot}</Link>
                 </form>
               </TabsContent>
 

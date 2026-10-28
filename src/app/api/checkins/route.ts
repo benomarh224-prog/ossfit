@@ -1,19 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { db } from "@/lib/db";
-import { requireAuth } from "@/lib/server-utils";
+import { requireClient } from "@/lib/server-utils";
 
 const schema = z.object({
-  weekLabel: z.string().min(2),
+  weekLabel: z.string().trim().min(2).max(100),
   weightKg: z.number().min(30).max(250).optional(),
   sleepHours: z.number().min(0).max(16).optional(),
   energyLevel: z.number().int().min(1).max(10).optional(),
   adherencePercent: z.number().int().min(0).max(100).optional(),
-  notes: z.string().optional(),
-});
+  notes: z.string().max(4000).optional(),
+}).strict();
 
 export async function GET() {
-  const session = await requireAuth();
+  const session = await requireClient();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const items = await db.checkIn.findMany({
     where: { userId: session.user.id },
@@ -23,7 +23,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await requireAuth();
+  const session = await requireClient();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   let body: unknown;

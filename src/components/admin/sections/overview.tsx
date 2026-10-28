@@ -14,7 +14,8 @@ import {
   Cell,
   Legend,
 } from "recharts";
-import { Users, Activity, Banknote, Inbox } from "lucide-react";
+import { Users, Activity, Banknote, Inbox, ListChecks, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useI18n, formatMAD } from "@/lib/i18n/i18n-provider";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { KpiCard, SectionLoading, ErrorState, SectionShell } from "../ui-bits";
@@ -42,7 +43,7 @@ function ChartTooltip({ active, payload, label }: any) {
   );
 }
 
-export default function OverviewSection() {
+export default function OverviewSection({ onLaunch }: { onLaunch: () => void }) {
   const { t, locale } = useI18n();
   const { data, isLoading, isError, refetch } = useQuery<AdminAnalytics>({
     queryKey: ["admin", "analytics"],
@@ -74,6 +75,7 @@ export default function OverviewSection() {
 
   return (
     <SectionShell title={t("admin.overview")} description={t("dashboard.subtitle")}>
+      <Card className="flex flex-wrap items-center justify-between gap-3 border-primary/20 bg-primary/5 p-4"><div className="flex items-center gap-3"><ListChecks className="size-5 shrink-0 text-primary" /><p className="text-sm font-medium">{locale === "ar" ? "كمل إعداداتك وراجع خطوات الانطلاق" : locale === "fr" ? "Complétez vos réglages et préparez le lancement" : "Complete your settings and prepare for launch"}</p></div><Button variant="outline" className="min-h-11 h-auto whitespace-normal" onClick={onLaunch}>{locale === "ar" ? "تجهيز الموقع" : locale === "fr" ? "Préparer le lancement" : "Launch checklist"}<ArrowRight className="size-4 rtl:rotate-180" /></Button></Card>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard
           index={0}

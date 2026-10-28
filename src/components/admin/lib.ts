@@ -3,6 +3,8 @@
 export type AdminSection =
   | "overview"
   | "clients"
+  | "messages"
+  | "launch"
   | "workouts"
   | "nutrition"
   | "pricing"

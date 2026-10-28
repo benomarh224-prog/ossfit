@@ -1,92 +1,49 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/server-utils";
+import { allowRequest } from "@/lib/rate-limit";
+import { conversationAccess, messageSchema } from "@/lib/messages-policy";
 
-// GET conversation between current user and the coach (or all conversations for the coach)
-export async function GET() {
+const noStore = { "Cache-Control": "private, no-store" };
+
+export async function GET(req: NextRequest) {
   const session = await requireAuth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  if (session.user.role === "COACH") {
-    // Return a list of clients who have exchanged messages, with last message
-    const msgs = await db.message.findMany({
-      where: { coachId: session.user.id },
-      orderBy: { createdAt: "desc" },
-      include: { client: { select: { id: true, name: true, email: true } } },
-    });
-    const map = new Map<string, { client: any; lastMessage: any; unread: number }>();
-    for (const m of msgs) {
-      const existing = map.get(m.clientId);
-      if (!existing) {
-        map.set(m.clientId, {
-          client: m.client,
-          lastMessage: m,
-          unread: m.sender === "CLIENT" && !m.read ? 1 : 0,
-        });
-      } else if (m.sender === "CLIENT" && !m.read) {
-        existing.unread++;
-      }
-    }
-    return NextResponse.json({ threads: Array.from(map.values()) });
+  if (!["COACH", "CLIENT"].includes(session.user.role)) return NextResponse.json({ error: "Unauthorized" }, { status: 403 });
+  const clientId = req.nextUrl.searchParams.get("clientId");
+  if (session.user.role === "COACH" && !clientId) {
+    // Counts only, so opening the inbox does not mark a conversation as read.
+    const grouped = await db.message.groupBy({ by: ["clientId"], where: { coachId: session.user.id, sender: "CLIENT", read: false }, _count: { _all: true } });
+    return NextResponse.json({ threads: grouped.map(g => ({ clientId: g.clientId, unread: g._count._all })) }, { headers: noStore });
   }
-
-  // Client: return their thread with the coach
-  const messages = await db.message.findMany({
-    where: { clientId: session.user.id },
-    orderBy: { createdAt: "asc" },
-  });
-  const coach = await db.user.findFirst({ where: { role: "COACH" }, select: { id: true, name: true } });
-  // mark client's inbound messages as read
-  await db.message.updateMany({
-    where: { clientId: session.user.id, sender: "COACH", read: false },
-    data: { read: true },
-  });
-  return NextResponse.json({ messages, coach });
+  const where = conversationAccess(session.user, clientId);
+  if (!where) return NextResponse.json({ error: "Invalid conversation" }, { status: 400 });
+  const before = req.nextUrl.searchParams.get("before");
+  if (before && !await db.message.findFirst({ where: { ...where, id: before }, select: { id: true } })) return NextResponse.json({ error: "Invalid cursor" }, { status: 400 });
+  const rows = await db.message.findMany({ where, orderBy: [{ createdAt: "desc" }, { id: "desc" }], take: 51, ...(before ? { cursor: { id: before }, skip: 1 } : {}) });
+  const more = rows.length > 50; const page = rows.slice(0, 50);
+  // Mark only displayed inbound messages. A new message arriving concurrently stays unread.
+  await db.message.updateMany({ where: { ...where, id: { in: page.map(m => m.id) }, sender: session.user.role === "COACH" ? "CLIENT" : "COACH", read: false }, data: { read: true } });
+  return NextResponse.json({ messages: page.reverse(), nextCursor: more ? rows[49].id : null }, { headers: noStore });
 }
 
 export async function POST(req: NextRequest) {
   const session = await requireAuth();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-  let body: { body?: string; clientId?: string };
-  try {
-    body = await req.json();
-  } catch {
-    return NextResponse.json({ error: "Invalid request" }, { status: 400 });
-  }
-  const text = (body.body ?? "").trim();
-  if (!text) return NextResponse.json({ error: "Empty message" }, { status: 400 });
-
-  let coachId: string;
-  let clientId: string;
-  let sender: "COACH" | "CLIENT";
-
-  if (session.user.role === "COACH") {
-    coachId = session.user.id;
-    clientId = body.clientId ?? "";
-    sender = "COACH";
-    if (!clientId) return NextResponse.json({ error: "clientId required" }, { status: 400 });
-  } else {
-    clientId = session.user.id;
-    const coach = await db.user.findFirst({ where: { role: "COACH" }, select: { id: true } });
-    if (!coach) return NextResponse.json({ error: "No coach found" }, { status: 500 });
-    coachId = coach.id;
-    sender = "CLIENT";
-  }
-
-  const msg = await db.message.create({
-    data: { coachId, clientId, sender, body: text },
+  if (req.headers.get("origin") !== new URL(req.url).origin || !req.headers.get("content-type")?.startsWith("application/json")) return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
+  if (!await allowRequest("messages", session.user.id, 30, 60_000)) return NextResponse.json({ error: "Too many messages. Try again shortly." }, { status: 429 });
+  const parsed = messageSchema.safeParse(await req.json().catch(() => null));
+  if (!parsed.success) return NextResponse.json({ error: "Enter a message of 1–4000 characters." }, { status: 400 });
+  const where = conversationAccess(session.user, parsed.data.clientId);
+  if (!where) return NextResponse.json({ error: "Invalid conversation" }, { status: 403 });
+  const client = await db.user.findFirst({ where: { id: where.clientId, role: "CLIENT" }, select: { id: true } });
+  const coach = session.user.role === "COACH" ? { id: session.user.id } : await db.user.findFirst({ where: { role: "COACH" }, select: { id: true } });
+  if (!client || !coach) return NextResponse.json({ error: "Conversation unavailable" }, { status: 404 });
+  const sender = session.user.role === "COACH" ? "COACH" : "CLIENT";
+  const message = await db.$transaction(async tx => {
+    const message = await tx.message.create({ data: { coachId: coach.id, clientId: client.id, sender, body: parsed.data.body } });
+    await tx.notification.create({ data: { userId: sender === "CLIENT" ? coach.id : client.id, title: sender === "CLIENT" ? "New client message" : "New message from your coach", body: parsed.data.body.slice(0, 120), type: "message" } });
+    return message;
   });
-
-  // create a notification for the recipient
-  await db.notification.create({
-    data: {
-      userId: sender === "CLIENT" ? coachId : clientId,
-      title: sender === "CLIENT" ? "New client message" : "New message from your coach",
-      body: text.slice(0, 120),
-      type: "message",
-    },
-  });
-
-  return NextResponse.json({ ok: true, message: msg });
+  return NextResponse.json({ ok: true, message }, { headers: noStore });
 }

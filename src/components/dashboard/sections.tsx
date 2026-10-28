@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { PlanMedia } from "@/components/plan-media";
+import { Conversation } from "@/components/conversation";
+import { AccountSettings } from "@/components/auth/account-settings";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
@@ -270,7 +272,7 @@ function LogWorkoutDialog({ open, onOpenChange, plan, onSubmit, loading }: any) 
 
 /* ============== NUTRITION ============== */
 export function Nutrition({ plan }: { plan: any }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const qc = useQueryClient();
   const [open, setOpen] = useState(false);
 
@@ -314,7 +316,7 @@ export function Nutrition({ plan }: { plan: any }) {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="font-display text-2xl font-bold uppercase sm:text-3xl">{t("dashboard.nutrition")}</h2>
           <p className="text-sm text-muted-foreground">{plan.title}</p>
@@ -322,6 +324,14 @@ export function Nutrition({ plan }: { plan: any }) {
         <Button onClick={() => setOpen(true)} className="bg-primary text-primary-foreground hover:bg-primary/90"><Plus className="mr-1 h-4 w-4" />{t("dashboard.addMeal")}</Button>
       </div>
 
+      <p className="text-sm leading-relaxed text-muted-foreground">{locale === "ar" ? "هنا البرنامج اللي وجد ليك الكوتش. «سجّل وجبتك» كتسجّل بها شنو كليتي اليوم باش تتابع التغذية ديالك." : locale === "fr" ? "Voici le programme de votre coach. « Noter votre repas » sert à suivre ce que vous avez réellement mangé aujourd’hui." : "This is your coach's plan. Use ‘Log your meal’ to record what you actually ate today and track your intake."}</p>
+      <Card className="border-primary/20 bg-card/70">
+        <CardHeader className="pb-3"><CardTitle className="font-display text-lg">{locale === "ar" ? "برنامج التغذية ديال الكوتش" : locale === "fr" ? "Le programme de votre coach" : "Your coach's nutrition plan"}</CardTitle></CardHeader>
+        <CardContent className="space-y-4">
+          {plan.meals?.length > 0 ? <div className="grid gap-3 sm:grid-cols-2">{plan.meals.map((meal: { name: string; suggestion?: string }, index: number) => <div key={index} className="rounded-xl border border-border bg-background/50 p-4"><h3 className="break-words font-semibold">{meal.name}</h3>{meal.suggestion && <p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-muted-foreground">{meal.suggestion}</p>}</div>)}</div> : <p className="text-sm text-muted-foreground">{locale === "ar" ? "راجع الأهداف اليومية وملاحظات الكوتش لتحت." : locale === "fr" ? "Consultez les objectifs quotidiens et les notes du coach ci-dessous." : "See the daily targets and coach notes below."}</p>}
+          {plan.notes && <div className="rounded-xl bg-primary/5 p-4"><h3 className="text-sm font-semibold">{locale === "ar" ? "ملاحظات الكوتش" : locale === "fr" ? "Notes du coach" : "Coach notes"}</h3><p className="mt-2 whitespace-pre-wrap break-words text-sm leading-relaxed text-muted-foreground">{plan.notes}</p></div>}
+        </CardContent>
+      </Card>
       <PlanMedia kind="nutrition" planId={plan.id} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard label={t("dashboard.calories")} value={`${totCals}/${plan.dailyCalories ?? "—"}`} icon={Activity} />
@@ -581,48 +591,9 @@ function CheckInDialog({ open, onOpenChange, onSubmit, loading }: any) {
 }
 
 /* ============== MESSAGES ============== */
-export function Messages({ coachId }: { coachId?: string }) {
+export function Messages() {
   const { t } = useI18n();
-  const qc = useQueryClient();
-  const [text, setText] = useState("");
-  const { data } = useQuery({
-    queryKey: ["messages"],
-    queryFn: () => apiFetch<any>("/api/messages"),
-    refetchInterval: 15000,
-  });
-  const messages = data?.messages ?? [];
-  const sendMut = useMutation({
-    mutationFn: (body: string) => apiFetch("/api/messages", { json: { body } }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ["messages"] }); setText(""); },
-    onError: (e: any) => toast.error(e.message),
-  });
-
-  return (
-    <div className="space-y-4">
-      <div>
-        <h2 className="font-display text-2xl font-bold uppercase sm:text-3xl">{t("dashboard.messages")}</h2>
-        <p className="text-sm text-muted-foreground">{t("coach.name")}</p>
-      </div>
-      <Card className="flex h-[60vh] flex-col border-border/50 bg-card/60">
-        <ScrollArea className="flex-1 p-4">
-          <div className="flex flex-col gap-2">
-            {messages.length === 0 ? <p className="py-10 text-center text-sm text-muted-foreground">{t("dashboard.noMessages")}</p> : messages.map((m: any) => (
-              <div key={m.id} className={`flex ${m.sender === "CLIENT" ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[80%] rounded-2xl px-3 py-2 text-sm ${m.sender === "CLIENT" ? "bg-primary text-primary-foreground" : "bg-card border border-border/50"}`}>
-                  <p>{m.body}</p>
-                  <p className="mt-0.5 text-[10px] opacity-60">{formatTime(m.createdAt)}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </ScrollArea>
-        <div className="flex items-center gap-2 border-t border-border/50 p-3">
-          <Input value={text} onChange={(e) => setText(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter" && text.trim()) sendMut.mutate(text.trim()); }} placeholder={t("dashboard.sendMessage")} />
-          <Button onClick={() => text.trim() && sendMut.mutate(text.trim())} className="bg-primary text-primary-foreground hover:bg-primary/90"><Send className="h-4 w-4" /></Button>
-        </div>
-      </Card>
-    </div>
-  );
+  return <div className="space-y-4"><h2 className="font-display text-2xl uppercase sm:text-3xl">{t("dashboard.messages")}</h2><Conversation /></div>;
 }
 
 /* ============== SUBSCRIPTION ============== */
@@ -894,15 +865,16 @@ export function Profile({ me, whatsapp }: { me: any; whatsapp?: string }) {
         <EmptyState title={t("dashboard.profile")} desc={t("dashboard.profile")} />
       )}
 
+      <AccountSettings />
       <Card className="border-border/50 bg-card/40">
-        <CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 font-display text-sm font-bold uppercase"><ShieldCheck className="h-4 w-4 text-primary" />Privacy & data</CardTitle></CardHeader>
+        <CardHeader className="pb-2"><CardTitle className="flex items-center gap-2 font-display text-sm font-bold uppercase"><ShieldCheck className="h-4 w-4 text-primary" />{locale === "ar" ? "الخصوصية والبيانات" : locale === "fr" ? "Confidentialité et données" : "Privacy & data"}</CardTitle></CardHeader>
         <CardContent className="space-y-3 text-xs text-muted-foreground">
           <p>
-            {locale === "fr" ? "Vos données sont privées et ne sont jamais partagées publiquement. Vous pouvez demander l'export ou la suppression de vos données à tout moment en contactant votre coach." : locale === "ar" ? "بياناتك خاصة ولا تُشارك علنا. يمكنك طلب تصدير أو حذف بياناتك في أيtime بالتواصل مع مدربك." : "Your data is private and never shared publicly. You can request data export or deletion at any time by contacting your coach."}
+            {locale === "fr" ? "Vos données sont privées et ne sont jamais partagées publiquement. Vous pouvez demander l'export ou la suppression de vos données à tout moment en contactant votre coach." : locale === "ar" ? "بياناتك خاصة ولا تُشارك علنا. يمكنك طلب تصدير أو حذف بياناتك في أي وقت بالتواصل مع مدربك." : "Your data is private and never shared publicly. You can request data export or deletion at any time by contacting your coach."}
           </p>
           <div className="flex flex-wrap gap-2">
             <a href={buildWhatsappLink(whatsapp, dataExportMsg)} target="_blank" rel="noreferrer">
-              <Button size="sm" variant="outline"><ShieldCheck className="mr-1.5 h-4 w-4" />Request data export / deletion</Button>
+              <Button size="sm" variant="outline" className="min-h-11 h-auto whitespace-normal"><ShieldCheck className="mr-1.5 h-4 w-4" />{locale === "ar" ? "طلب نسخة من البيانات أو حذفها" : locale === "fr" ? "Demander une copie ou la suppression" : "Request data export / deletion"}</Button>
             </a>
           </div>
         </CardContent>

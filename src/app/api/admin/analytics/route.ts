@@ -24,7 +24,7 @@ export async function GET() {
   const totalRevenue = verifiedPayments.reduce((s, p) => s + p.amountMAD, 0);
 
   // package distribution
-  const subs = await db.subscription.findMany({ include: { package: true } });
+  const subs = await db.subscription.findMany({ where: { status: "ACTIVE", OR: [{ endDate: null }, { endDate: { gt: new Date() } }] }, include: { package: true } });
   const pkgMap = new Map<string, number>();
   for (const s of subs) {
     const k = s.package?.title ?? "Unknown";

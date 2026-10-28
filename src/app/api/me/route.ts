@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireAuth, parseJSON } from "@/lib/server-utils";
+import { withSubscriptionStatus } from "@/lib/subscription-status";
 
 export async function GET() {
   const session = await requireAuth();
@@ -45,7 +46,7 @@ export async function GET() {
       phone: user.phone,
     },
     profile,
-    activeSubscription: user.subscriptions[0] ?? null,
+    activeSubscription: user.subscriptions[0] ? withSubscriptionStatus(user.subscriptions[0]) : null,
     payments: user.payments.map((p) => ({
       ...p,
       packageTitle: p.subscription?.package?.title ?? p.packageTitle,

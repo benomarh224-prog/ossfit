@@ -19,13 +19,24 @@ npm run dev
 
 1. Open the private owner setup link supplied separately. Choose the coach email and a password of at least 12 characters. The link closes permanently after the first coach account is created.
 2. Open `/admin` and sign in with the coach account to open administration. This page also lets you switch from an active subscriber session. Ordinary public registration creates subscriber accounts and never grants coach access. A successful sign-in fully reloads the destination to discard the previous account's router and query caches. `View site` opens the public page in another tab.
-   In **Account settings**, change the sign-in email and/or password by confirming the current password. All sessions are revoked after saving; sign in again with the updated credentials. Email recovery for a forgotten password is not implemented.
+   In **Account settings**, change the sign-in email and/or password by confirming the current password. All sessions are revoked after saving; sign in again with the updated credentials. Clients have the same controls in their Profile section.
+   Generate a **coach recovery key** while you know your current password and keep it in a password manager. It is shown only when generated, works once for one year, and is invalidated by an email/password change or a replacement key. Use `/reset-password` if you need it. Anyone with this key can reset the coach password.
+   A coach can generate a client's one-use 15-minute recovery link from their client profile, after confirming the coach password. Verify the client's identity through an already-known contact before sharing. The application does not send WhatsApp messages automatically. Email recovery is not enabled: there is no connected email provider or verified sending domain.
 3. Review the coach name, professional contact details, images and copy in Site Content. The surname and exact city were not supplied. The current training imagery is illustrative, not a verified portrait of the coach.
 4. Confirm the package scope and prices: 399 / 699 / 1199 MAD per month. The coach can edit, hide or add packages.
 5. Enter the real bank beneficiary, IBAN/RIB and payment instructions before accepting transfers. The site does not charge cards or renew subscriptions automatically.
 6. Add only consented client testimonials and transformation images. No invented client results are seeded publicly.
 7. Review the privacy notice and agree service start dates, renewals, cancellations and refund conditions with clients. The information pages describe the application; they do not establish a jurisdiction-specific legal compliance review.
 8. Transfer or arrange ownership of the GitHub repository, Vercel project, domain, database and Blob store with the buyer. Hosting and storage usage remain billed to the account that owns them.
+9. Open **Launch checklist** in administration for live checks of filled-in contact, bank, package, portrait and recovery settings, and a practical launch guide. These checks do not certify the accuracy of business details or replace real phone testing and a backup restore drill.
+
+## Coaching workflow
+
+The **Messages** section lets the coach read and answer each client's private conversation. Clients see the same conversation in their dashboard. Messages are bounded to 4,000 characters, sent transactionally with notifications, and paged in groups of 50. The active conversation refreshes every 30 seconds while the page is visible. The notification bell displays the latest 30 notices, refreshes on opening/focus and supports marking only displayed notices as read.
+
+In a client profile the coach can review the latest 20 weekly check-ins, write feedback and see the latest 12 private progress photos. Check-in feedback rejects stale concurrent edits and notifies the client. Additional history remains stored; the coach preview intentionally shows only the latest items.
+
+The client's nutrition screen shows the coach's actual meal suggestions and notes separately from **Log your meal**, which records what the client ate. Approving an assessment never activates an unpaid subscription. Payment verification activates service transactionally; retries do not activate twice, and a renewal preserves remaining paid days. Reusing the same proof returns the existing submission, while another pending proof for the same package is rejected for coach review.
 
 ## Access and uploads
 
@@ -50,4 +61,6 @@ npm audit
 npm run build
 ```
 
-The private owner setup link must never be committed, included in a sales listing or forwarded to anyone except the intended owner. Password recovery by email is not implemented; keep the coach credentials in a password manager and arrange a verified support procedure before broad public launch.
+The private owner setup link, recovery keys and client recovery links must never be committed, included in a sales listing or shared publicly. Recovery secrets are random, stored only as SHA-256 hashes and tied to the account's session version. Reset links carry their secret in the URL fragment; the browser removes it after filling the form. Expired, consumed or revoked keys cannot reset a password. Resetting revokes previous sessions and never changes the account role.
+
+Production build, type and service checks are automated. Real authenticated coach/client phone testing remains required; browser automation is disabled in the current workspace. A database backup, media backup, restore test, dedicated preview database and custom domain are not provisioned by these code changes. See [OWNER-GUIDE.md](OWNER-GUIDE.md) for the handoff checklist.

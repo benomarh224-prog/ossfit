@@ -46,6 +46,17 @@ model User {
   progressPhotos ProgressPhoto[]
   subscriptions  Subscription[]
   notifications   Notification[]
+  passwordReset   PasswordResetToken?
+}
+
+// Only a hash is stored. A credential change invalidates every outstanding token.
+model PasswordResetToken {
+  tokenHash      String   @id
+  userId         String   @unique
+  sessionVersion Int
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model Account {
@@ -423,6 +434,10 @@ model Message {
 
   coach  User @relation("CoachMessages",  fields: [coachId],  references: [id], onDelete: Cascade)
   client User @relation("ClientMessages", fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([coachId, clientId, createdAt, id])
+  @@index([clientId, createdAt, id])
+  @@index([coachId, sender, read])
 }
 
 model Notification {
@@ -435,6 +450,8 @@ model Notification {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
 
 // ---------------------------------------------------------------------------

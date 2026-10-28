@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import dynamic from "next/dynamic";
+import { SectionLoading } from "./ui-bits";
 import { useSession, signOut } from "next-auth/react";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import {
@@ -21,6 +23,8 @@ import {
   Menu,
   Shield,
   Settings,
+  MessageSquare,
+  ListChecks,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -32,20 +36,23 @@ import type { AdminSection } from "./lib";
 import { ThemeSwitcher } from "@/components/site/theme-switcher";
 import { LanguageSwitcher } from "@/components/site/language-switcher";
 
-import OverviewSection from "./sections/overview";
-import ClientsSection from "./sections/clients";
-import WorkoutsSection from "./sections/workouts";
-import NutritionSection from "./sections/nutrition";
-import PricingSection from "./sections/pricing";
-import TestimonialsSection from "./sections/testimonials";
-import TransformationsSection from "./sections/transformations";
-import FaqSection from "./sections/faq";
-import ContentSection from "./sections/content";
-import ServicesSection from "./sections/services";
-import ConsultationsSection from "./sections/consultations";
-import PaymentsSection from "./sections/payments";
-import AnalyticsSection from "./sections/analytics";
-import AccountSection from "./sections/account";
+const OverviewSection = dynamic(() => import("./sections/overview"), { loading: () => <SectionLoading rows={4} /> });
+const ClientsSection = dynamic(() => import("./sections/clients"), { loading: () => <SectionLoading rows={4} /> });
+const WorkoutsSection = dynamic(() => import("./sections/workouts"), { loading: () => <SectionLoading rows={4} /> });
+const NutritionSection = dynamic(() => import("./sections/nutrition"), { loading: () => <SectionLoading rows={4} /> });
+const PricingSection = dynamic(() => import("./sections/pricing"), { loading: () => <SectionLoading rows={4} /> });
+const TestimonialsSection = dynamic(() => import("./sections/testimonials"), { loading: () => <SectionLoading rows={4} /> });
+const TransformationsSection = dynamic(() => import("./sections/transformations"), { loading: () => <SectionLoading rows={4} /> });
+const FaqSection = dynamic(() => import("./sections/faq"), { loading: () => <SectionLoading rows={4} /> });
+const ContentSection = dynamic(() => import("./sections/content"), { loading: () => <SectionLoading rows={4} /> });
+const ServicesSection = dynamic(() => import("./sections/services"), { loading: () => <SectionLoading rows={4} /> });
+const ConsultationsSection = dynamic(() => import("./sections/consultations"), { loading: () => <SectionLoading rows={4} /> });
+const PaymentsSection = dynamic(() => import("./sections/payments"), { loading: () => <SectionLoading rows={4} /> });
+const AnalyticsSection = dynamic(() => import("./sections/analytics"), { loading: () => <SectionLoading rows={4} /> });
+const AccountSection = dynamic(() => import("./sections/account"), { loading: () => <SectionLoading rows={4} /> });
+const MessagesSection = dynamic(() => import("./sections/messages"), { loading: () => <SectionLoading rows={4} /> });
+const LaunchSection = dynamic(() => import("./sections/launch"), { loading: () => <SectionLoading rows={4} /> });
+import { Notifications } from "@/components/notifications";
 
 interface NavItem {
   id: AdminSection;
@@ -58,6 +65,7 @@ function useNav(): NavItem[] {
   return [
     { id: "overview", label: t("admin.overview"), icon: LayoutDashboard },
     { id: "clients", label: t("admin.clients"), icon: Users },
+    { id: "messages", label: t("dashboard.messages"), icon: MessageSquare },
     { id: "workouts", label: t("admin.workouts"), icon: Dumbbell },
     { id: "nutrition", label: t("admin.nutrition"), icon: Salad },
     { id: "pricing", label: t("admin.pricing"), icon: Package },
@@ -70,6 +78,7 @@ function useNav(): NavItem[] {
     { id: "payments", label: t("admin.payments"), icon: CreditCard },
     { id: "analytics", label: t("admin.analytics"), icon: BarChart3 },
     { id: "account", label: locale === "ar" ? "إعدادات الحساب" : locale === "fr" ? "Paramètres du compte" : "Account settings", icon: Settings },
+    { id: "launch", label: locale === "ar" ? "تجهيز الموقع" : locale === "fr" ? "Préparer le lancement" : "Launch checklist", icon: ListChecks },
   ];
 }
 
@@ -238,6 +247,7 @@ export function AdminApp() {
                 {activeItem?.label ?? t("admin.overview")}
               </h1>
             </div>
+            <Notifications onNavigate={type => { const map: Record<string, AdminSection> = { message: "messages", payment: "payments", checkin: "clients", security: "account", consultation: "consultations" }; switchSection(map[type] ?? "overview"); }} />
             <ThemeSwitcher />
             <LanguageSwitcher compact />
             <div className="hidden items-center gap-2 sm:flex">
@@ -283,7 +293,7 @@ export function AdminApp() {
                   transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
                   className="mx-auto max-w-7xl"
                 >
-                  {renderSection(section)}
+                  {renderSection(section, switchSection)}
                 </motion.div>
               </AnimatePresence>
             )}
@@ -294,12 +304,16 @@ export function AdminApp() {
   );
 }
 
-function renderSection(section: AdminSection) {
+function renderSection(section: AdminSection, onNavigate: (section: AdminSection) => void) {
   switch (section) {
     case "overview":
-      return <OverviewSection />;
+      return <OverviewSection onLaunch={() => onNavigate("launch")} />;
     case "clients":
       return <ClientsSection />;
+    case "messages":
+      return <MessagesSection />;
+    case "launch":
+      return <LaunchSection onNavigate={onNavigate} />;
     case "workouts":
       return <WorkoutsSection />;
     case "nutrition":

@@ -4,8 +4,20 @@ import { db } from "@/lib/db";
 import { requireCoach } from "@/lib/server-utils";
 
 const schema = z.object({
-  status: z.enum(["PENDING", "APPROVED", "ACTIVE", "REJECTED", "PAUSED"]).optional(),
-});
+  status: z.enum(["PENDING", "APPROVED", "ACTIVE", "REJECTED", "PAUSED"]),
+}).strict();
+
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  const session = await requireCoach();
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const { id } = await params;
+  if (!await db.user.findFirst({ where: { id, role: "CLIENT" }, select: { id: true } })) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  const [checkIns, photos] = await Promise.all([
+    db.checkIn.findMany({ where: { userId: id }, orderBy: { createdAt: "desc" }, take: 20 }),
+    db.progressPhoto.findMany({ where: { userId: id }, orderBy: { takenAt: "desc" }, take: 12 }),
+  ]);
+  return NextResponse.json({ checkIns, photos }, { headers: { "Cache-Control": "private, no-store" } });
+}
 
 // PATCH — approve / reject / change status of a client profile
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -13,6 +25,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
   const session = await requireCoach();
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  if (req.headers.get("origin") !== new URL(req.url).origin || !req.headers.get("content-type")?.startsWith("application/json")) return NextResponse.json({ error: "Invalid origin" }, { status: 403 });
   let body: unknown;
   try {
     body = await req.json();
@@ -30,21 +43,17 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
 
   const updated = await db.clientProfile.update({
     where: { userId: id },
-    data: { status: status ?? "ACTIVE" },
+    data: { status },
   });
 
-  // if approved, activate their pending subscription
+  // Approving an application is separate from verifying a payment.
   if (status === "ACTIVE" || status === "APPROVED") {
-    await db.subscription.updateMany({
-      where: { userId: id, status: "PENDING" },
-      data: { status: "ACTIVE", startDate: new Date(), endDate: new Date(Date.now() + 30 * 86400000) },
-    });
     await db.notification.create({
       data: {
         userId: id,
         title: "Your application has been approved",
-        body: "Welcome aboard! Your coaching program is now active.",
-        type: "success",
+        body: "Your assessment has been approved. Check your plans and confirm the next steps with your coach.",
+        type: "info",
       },
     });
   }

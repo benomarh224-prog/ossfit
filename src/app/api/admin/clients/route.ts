@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { requireCoach, parseJSON } from "@/lib/server-utils";
+import { withSubscriptionStatus } from "@/lib/subscription-status";
 
 export async function GET() {
   const session = await requireCoach();
@@ -26,7 +27,7 @@ export async function GET() {
       profile: c.clientProfile
         ? { ...c.clientProfile, equipment: parseJSON<string[]>(c.clientProfile.equipment, []) }
         : null,
-      activeSubscription: c.subscriptions[0] ?? null,
+      activeSubscription: c.subscriptions[0] ? withSubscriptionStatus(c.subscriptions[0]) : null,
       lastPayment: c.payments[0] ?? null,
     })),
   });

@@ -30,6 +30,8 @@ import { apiFetch, type AdminClient, type ClientStatus } from "../lib";
 import { AssignWorkoutDialog } from "./assign-workout-dialog";
 import { AssignNutritionDialog } from "./assign-nutrition-dialog";
 import { DialogBackButton } from "../dialog-back-button";
+import { RecoveryManager } from "@/components/auth/recovery-manager";
+import { ClientProgress } from "../client-progress";
 
 export default function ClientsSection() {
   const { t, locale } = useI18n();
@@ -199,7 +201,7 @@ export default function ClientsSection() {
               {selected?.phone ? ` · ${selected.phone}` : ""}
             </DialogDescription>
           </DialogHeader>
-          <div className="min-h-0 overflow-y-auto overscroll-contain p-4">{selected && <ProfileBody client={selected} goalLabel={goalLabel} />}</div>
+          <div className="min-h-0 space-y-5 overflow-y-auto overscroll-contain p-4">{selected && <><ProfileBody client={selected} goalLabel={goalLabel} /><ClientProgress key={`progress:${selected.id}`} clientId={selected.id} /><RecoveryManager key={selected.id} clientId={selected.id} /></>}</div>
           <DialogFooter className="flex-col gap-2 border-t border-border bg-background p-3 sm:flex-row sm:justify-between">
             <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
               <Button
