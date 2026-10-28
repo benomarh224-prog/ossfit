@@ -1,5 +1,8 @@
 "use client";
 
+import { PlanMedia } from "@/components/plan-media";
+import { DialogBackButton } from "../dialog-back-button";
+
 import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Loader2 } from "lucide-react";
@@ -38,6 +41,8 @@ export function CreateNutritionDialog({
   clients?: AdminClient[];
 }) {
   const qc = useQueryClient();
+  const [createdPlan, setCreatedPlan] = React.useState<string | null>(null);
+  React.useEffect(() => { if (!open) setCreatedPlan(null); }, [open]);
   const [userId, setUserId] = React.useState<string>(presetUserId ?? "");
   const [title, setTitle] = React.useState("");
   const [dailyCalories, setDailyCalories] = React.useState<number | "">("");
@@ -80,15 +85,15 @@ export function CreateNutritionDialog({
           suggestion: m.suggestion || undefined,
         })),
       };
-      return apiFetch("/api/admin/nutrition", {
+      return apiFetch<{ plan: { id: string } }>("/api/admin/nutrition", {
         method: "POST",
         body: JSON.stringify(payload),
       });
     },
-    onSuccess: () => {
+    onSuccess: (data: { plan: { id: string } }) => {
       toast.success("Nutrition plan assigned");
       qc.invalidateQueries({ queryKey: ["admin", "nutrition"] });
-      onOpenChange(false);
+      setCreatedPlan(data.plan.id);
       reset();
     },
     onError: (e: unknown) => toast.error(e instanceof Error ? e.message : "Failed"),
@@ -111,13 +116,19 @@ export function CreateNutritionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] max-w-3xl overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="font-display text-xl">Create nutrition plan</DialogTitle>
+      <DialogContent showCloseButton={false} className="max-h-[85dvh] sm:max-h-[90dvh] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-w-3xl">
+        {createdPlan ? <>
+          <DialogHeader className="border-b border-border px-4 py-2 text-start"><div className="flex items-center gap-2"><DialogBackButton onBack={() => onOpenChange(false)} /><DialogTitle className="font-display text-lg">Photos &amp; videos</DialogTitle></div><DialogDescription className="pb-2">Plan saved. Add private guidance for the trainee.</DialogDescription></DialogHeader>
+          <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain p-4"><PlanMedia kind="nutrition" planId={createdPlan} manage /></div>
+          <DialogFooter className="border-t border-border bg-background p-3"><Button className="min-h-11" onClick={() => onOpenChange(false)}>Done</Button></DialogFooter>
+        </> : <>
+        <DialogHeader className="border-b border-border px-4 py-2 text-start">
+          <div className="flex items-center gap-2"><DialogBackButton onBack={() => onOpenChange(false)} /><DialogTitle className="min-w-0 font-display text-lg">Create nutrition plan</DialogTitle></div>
           <DialogDescription>
             Daily targets and meal suggestions for the client.
           </DialogDescription>
         </DialogHeader>
+        <div className="min-h-0 space-y-4 overflow-y-auto overscroll-contain p-4">
 
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="space-y-1.5">
@@ -250,7 +261,8 @@ export function CreateNutritionDialog({
           />
         </div>
 
-        <DialogFooter>
+        </div>
+        <DialogFooter className="border-t border-border bg-background p-3 [&_button]:min-h-11">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
@@ -259,6 +271,7 @@ export function CreateNutritionDialog({
             Save plan
           </Button>
         </DialogFooter>
+        </>}
       </DialogContent>
     </Dialog>
   );

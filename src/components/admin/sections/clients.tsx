@@ -29,6 +29,7 @@ import { SectionShell, SectionLoading, ErrorState, EmptyState, StatusBadge } fro
 import { apiFetch, type AdminClient, type ClientStatus } from "../lib";
 import { AssignWorkoutDialog } from "./assign-workout-dialog";
 import { AssignNutritionDialog } from "./assign-nutrition-dialog";
+import { DialogBackButton } from "../dialog-back-button";
 
 export default function ClientsSection() {
   const { t, locale } = useI18n();
@@ -188,23 +189,24 @@ export default function ClientsSection() {
 
       {/* Profile dialog */}
       <Dialog open={!!selected} onOpenChange={(o) => !o && setSelected(null)}>
-        <DialogContent className="sm:max-w-2xl">
-          <DialogHeader>
-            <DialogTitle className="font-display text-xl">
+        <DialogContent showCloseButton={false} className="max-h-[85dvh] sm:max-h-[90dvh] grid-rows-[auto_minmax(0,1fr)_auto] gap-0 overflow-hidden p-0 sm:max-w-2xl">
+          <DialogHeader className="border-b border-border px-4 py-2 text-start">
+            <div className="flex items-center gap-2"><DialogBackButton onBack={() => setSelected(null)} /><DialogTitle className="min-w-0 flex-1 break-words font-display text-lg">
               {selected?.name ?? "Client profile"}
-            </DialogTitle>
-            <DialogDescription>
+            </DialogTitle></div>
+            <DialogDescription className="break-words pb-2 text-start">
               {selected?.email}
               {selected?.phone ? ` · ${selected.phone}` : ""}
             </DialogDescription>
           </DialogHeader>
-          {selected && <ProfileBody client={selected} goalLabel={goalLabel} />}
-          <DialogFooter className="flex-col gap-2 sm:flex-row sm:justify-between">
-            <div className="flex flex-wrap gap-2">
+          <div className="min-h-0 overflow-y-auto overscroll-contain p-4">{selected && <ProfileBody client={selected} goalLabel={goalLabel} />}</div>
+          <DialogFooter className="flex-col gap-2 border-t border-border bg-background p-3 sm:flex-row sm:justify-between">
+            <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setAssignWorkoutFor(selected)}
+                className="min-h-11 whitespace-normal"
+                onClick={() => { setAssignWorkoutFor(selected); setSelected(null); }}
               >
                 <Dumbbell className="size-4" />
                 {t("admin.assignWorkout")}
@@ -212,7 +214,8 @@ export default function ClientsSection() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => setAssignNutritionFor(selected)}
+                className="min-h-11 whitespace-normal"
+                onClick={() => { setAssignNutritionFor(selected); setSelected(null); }}
               >
                 <Salad className="size-4" />
                 {t("admin.assignNutrition")}
@@ -252,14 +255,14 @@ export default function ClientsSection() {
       {/* Assign workout dialog */}
       <AssignWorkoutDialog
         client={assignWorkoutFor}
-        onClose={() => setAssignWorkoutFor(null)}
+        onClose={() => { setSelected(assignWorkoutFor); setAssignWorkoutFor(null); }}
         coachId={session?.user?.id}
       />
 
       {/* Assign nutrition dialog */}
       <AssignNutritionDialog
         client={assignNutritionFor}
-        onClose={() => setAssignNutritionFor(null)}
+        onClose={() => { setSelected(assignNutritionFor); setAssignNutritionFor(null); }}
       />
     </SectionShell>
   );

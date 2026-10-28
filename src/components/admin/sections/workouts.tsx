@@ -1,5 +1,7 @@
 "use client";
 
+import { PlanMedia } from "@/components/plan-media";
+
 import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Loader2, Dumbbell } from "lucide-react";
@@ -101,7 +103,7 @@ export default function WorkoutsSection() {
                       size="sm"
                       onClick={() => setExpanded((e) => ({ ...e, [p.id]: !e[p.id] }))}
                     >
-                      {expanded[p.id] ? "Hide" : "View"}
+                      {expanded[p.id] ? "Hide" : "View / add media"}
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -141,6 +143,7 @@ export default function WorkoutsSection() {
               </CardHeader>
               {expanded[p.id] && (
                 <CardContent className="pt-4">
+                  <PlanMedia kind="workout" planId={p.id} manage />
                   {p.summary && (
                     <p className="mb-4 text-sm text-muted-foreground">{p.summary}</p>
                   )}

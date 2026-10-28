@@ -1,5 +1,7 @@
 "use client";
 
+import { PlanMedia } from "@/components/plan-media";
+
 import * as React from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Plus, Trash2, Loader2, Salad } from "lucide-react";
@@ -100,7 +102,7 @@ export default function NutritionSection() {
                       size="sm"
                       onClick={() => setExpanded((e) => ({ ...e, [p.id]: !e[p.id] }))}
                     >
-                      {expanded[p.id] ? "Hide" : "View"}
+                      {expanded[p.id] ? "Hide" : "View / add media"}
                     </Button>
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
@@ -140,6 +142,7 @@ export default function NutritionSection() {
               </CardHeader>
               {expanded[p.id] && (
                 <CardContent className="pt-4">
+                  <PlanMedia kind="nutrition" planId={p.id} manage />
                   <div className="mb-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
                     <Macro label="Calories" value={p.dailyCalories ?? null} suffix="kcal" />
                     <Macro label="Protein" value={p.proteinG ?? null} suffix="g" />

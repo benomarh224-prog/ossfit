@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { PlanMedia } from "@/components/plan-media";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion } from "framer-motion";
 import {
@@ -164,6 +165,7 @@ export function Workouts({ whatsapp }: { whatsapp?: string }) {
         {plan && <Button onClick={() => setOpen(true)} className="bg-primary text-primary-foreground hover:bg-primary/90"><Plus className="mr-1 h-4 w-4" />{t("dashboard.completeWorkout")}</Button>}
       </div>
 
+      {plan && <PlanMedia kind="workout" planId={plan.id} />}
       {!plan ? (
         <EmptyState title={t("dashboard.noWorkouts")} desc={t("dashboard.noWorkouts")} whatsapp={{ number: whatsapp, message: "Hello! When will my workout program be ready?" }} />
       ) : (
@@ -320,6 +322,7 @@ export function Nutrition({ plan }: { plan: any }) {
         <Button onClick={() => setOpen(true)} className="bg-primary text-primary-foreground hover:bg-primary/90"><Plus className="mr-1 h-4 w-4" />{t("dashboard.addMeal")}</Button>
       </div>
 
+      <PlanMedia kind="nutrition" planId={plan.id} />
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <KpiCard label={t("dashboard.calories")} value={`${totCals}/${plan.dailyCalories ?? "—"}`} icon={Activity} />
         <KpiCard label={t("dashboard.protein")} value={`${totP}g`} />
