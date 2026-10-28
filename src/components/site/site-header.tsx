@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 import { Menu, X, Dumbbell, LogIn, UserPlus } from "lucide-react";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
@@ -33,20 +32,12 @@ export function SiteHeader({ brandName, showResults = false, showTestimonials = 
   const destination = signedInDestination(session?.user);
   const c = accountCopy[locale];
   const isRTL = locale === "ar";
-  const [scrolled, setScrolled] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
   const [authTab, setAuthTab] = useState<"login" | "register">("login");
   const [active, setActive] = useState<string>("");
   const [mobileOpen, setMobileOpen] = useState(false);
   const [switching, setSwitching] = useState(false);
   const navigation = NAV.filter((item) => (item.href !== "#results" || showResults) && (item.href !== "#testimonials" || showTestimonials));
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
 
   // Scroll-spy: highlight the section currently in view
   useEffect(() => {
@@ -77,12 +68,7 @@ export function SiteHeader({ brandName, showResults = false, showTestimonials = 
 
   return (
     <header
-      className={cn(
-        "fixed inset-x-0 top-0 z-40 transition-all duration-300",
-        scrolled
-          ? "border-b border-border/50 bg-background/85 backdrop-blur-xl"
-          : "bg-gradient-to-b from-background/70 via-background/30 to-transparent backdrop-blur-[2px]"
-      )}
+      className="fixed inset-x-0 top-0 z-40 bg-background"
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
         <Link href="#top" className="flex min-w-0 items-center gap-2" aria-label={brandName || "Coach Oussama"}>
@@ -117,9 +103,9 @@ export function SiteHeader({ brandName, showResults = false, showTestimonials = 
           })}
         </nav>
 
-        <div className="flex shrink-0 items-center gap-0.5 sm:gap-1.5">
-          <ThemeSwitcher />
-          <LanguageSwitcher compact />
+        <div data-ui className="flex shrink-0 items-center gap-0.5 sm:gap-1.5">
+          <ThemeSwitcher minimal />
+          <LanguageSwitcher compact minimal />
           {status === "loading" ? <Skeleton className="hidden h-11 w-24 rounded-xl sm:block" /> : destination && session?.user ? <div className="hidden sm:block"><AccountMenu user={session.user} destination={destination} onSwitch={() => openAuth("login", true)} /></div> : <><Button
             variant="ghost"
             size="sm"
@@ -176,7 +162,7 @@ export function SiteHeader({ brandName, showResults = false, showTestimonials = 
                     </SheetClose>
                   ))}
                 </nav>
-                <div className="space-y-2 border-t border-border/50 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
+                <div className="space-y-2 bg-secondary/50 p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))]">
                   {!destination && status !== "loading" && <>
                   <SheetClose asChild>
                     <Button
@@ -199,7 +185,7 @@ export function SiteHeader({ brandName, showResults = false, showTestimonials = 
                   </SheetClose>
                   </>}
                   <div className="flex items-center justify-between pt-2">
-                    <span className="text-xs uppercase tracking-wider text-muted-foreground">
+                    <span className="text-sm font-medium">
                       {t("nav.language")}
                     </span>
                     <LanguageSwitcher />

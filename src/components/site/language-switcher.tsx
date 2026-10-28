@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 const HINT = { en: "Browse in the language you prefer.", fr: "Naviguez dans la langue de votre choix.", ar: "تصفح الموقع باللغة اللي كتفضّل." };
 const DESCRIPTIONS = { en: "Continue in English", fr: "Continuer en français", ar: "المتابعة باللغة العربية" };
 
-export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
+export function LanguageSwitcher({ compact = false, minimal = false }: { compact?: boolean; minimal?: boolean }) {
   const { locale, setLocale, t } = useI18n();
   const current = locales.find((l) => l.code === locale) ?? locales[0];
   const [open, setOpen] = useState(false);
@@ -22,7 +22,7 @@ export function LanguageSwitcher({ compact = false }: { compact?: boolean }) {
         <Button
           variant="ghost"
           size={compact ? "icon" : "sm"}
-          className={`${compact ? "size-11 sm:size-9" : "min-h-11 px-3"} shrink-0 gap-2 rounded-full border border-border/60 bg-card/70 text-foreground/80 shadow-sm hover:border-primary/40 hover:bg-accent hover:text-primary`}
+          className={minimal ? `${compact ? "size-11" : "min-h-11 px-3"} shrink-0 gap-2 rounded-none text-foreground hover:bg-accent` : `${compact ? "size-11 sm:size-9" : "min-h-11 px-3"} shrink-0 gap-2 rounded-full border border-border/60 bg-card/70 text-foreground/80 shadow-sm hover:border-primary/40 hover:bg-accent hover:text-primary`}
           aria-label={t("nav.language") || "Language"}
         >
           <Languages className="h-4 w-4" />
