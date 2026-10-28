@@ -61,7 +61,7 @@ export default function AccountSection() {
       form.reset();
       setSaved(true);
       // Revoke the current browser cookie too; the server has revoked all sessions.
-      await signOut({ callbackUrl: "/" });
+      await signOut({ callbackUrl: "/admin" });
     } catch {
       setError(c.errors.FAILED);
     } finally {
@@ -78,7 +78,7 @@ export default function AccountSection() {
       {saved ? (
         <div className="space-y-4" role="status">
           <p>{c.saved}</p>
-          <Button onClick={() => signOut({ callbackUrl: "/" })}>{c.signin}</Button>
+          <Button onClick={() => signOut({ callbackUrl: "/admin" })}>{c.signin}</Button>
         </div>
       ) : (
         <form onSubmit={submit} className="space-y-4">

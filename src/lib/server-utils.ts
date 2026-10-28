@@ -1,4 +1,5 @@
 import { db } from "@/lib/db";
+import { signedInDestination } from "@/lib/login-access";
 
 // Helpers for JSON-encoded string fields.
 export function parseJSON<T>(value: string | null | undefined, fallback: T): T {
@@ -32,7 +33,7 @@ export async function getSession() {
 
 export async function requireCoach() {
   const session = await getSession();
-  if (!session || session.user.role !== "COACH") return null;
+  if (!session || signedInDestination(session.user) !== "/admin") return null;
   return session;
 }
 

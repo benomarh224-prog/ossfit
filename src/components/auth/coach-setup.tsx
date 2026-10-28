@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ShieldCheck, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,6 @@ import { Label } from "@/components/ui/label";
 import { ThemeSwitcher } from "@/components/site/theme-switcher";
 
 export function CoachSetup() {
-  const router = useRouter();
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -29,9 +27,9 @@ export function CoachSetup() {
       const data = await response.json();
       if (!response.ok) throw new Error(data.error || "Setup failed");
       history.replaceState(null, "", "/setup");
-      const login = await signIn("credentials", { email, password, redirect: false });
-      if (login?.error) { window.location.href = "/"; return; }
-      router.push("/"); router.refresh();
+      const login = await signIn("credentials", { email, password, portal: "admin", redirect: false });
+      if (!login?.ok || login.error) { window.location.replace("/admin"); return; }
+      window.location.replace("/admin");
     } catch (error) { setError(error instanceof Error ? error.message : "Please try again"); }
     finally { setLoading(false); }
   }

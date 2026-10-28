@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { signIn } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { getSession, signIn } from "next-auth/react";
+import { signedInDestination } from "@/lib/login-access";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -53,7 +53,6 @@ export function AuthModal({
   defaultTab?: "login" | "register";
 }) {
   const { t } = useI18n();
-  const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState(defaultTab);
   useEffect(() => { if (open) setTab(defaultTab); }, [open, defaultTab]);
@@ -61,19 +60,26 @@ export function AuthModal({
   const loginForm = useForm<LoginValues>({ resolver: zodResolver(loginSchema) });
   const registerForm = useForm<RegisterValues>({ resolver: zodResolver(registerSchema) });
 
+  async function openSignedInAccount() {
+    const session = await getSession();
+    const destination = signedInDestination(session?.user);
+    if (!destination) throw new Error("Unable to load your account. Please sign in again.");
+    onOpenChange(false);
+    window.location.assign(destination);
+  }
+
   async function onLogin(values: LoginValues) {
     setLoading(true);
     try {
       const res = await signIn("credentials", {
         email: values.email, password: values.password, redirect: false,
       });
-      if (res?.error) {
+      if (!res?.ok || res.error) {
         toast.error("Invalid email or password");
         return;
       }
       toast.success(t("auth.loginTitle"));
-      onOpenChange(false);
-      router.refresh();
+      await openSignedInAccount();
     } catch {
       toast.error("Unable to sign in. Please try again.");
     } finally {
@@ -90,10 +96,9 @@ export function AuthModal({
         password: values.password,
         redirect: false,
       });
-      if (res?.error) throw new Error("Login failed");
+      if (!res?.ok || res.error) throw new Error("Login failed");
       toast.success(t("auth.registerTitle"));
-      onOpenChange(false);
-      router.refresh();
+      await openSignedInAccount();
     } catch (e: any) {
       toast.error(e.message || "Registration failed");
     } finally {

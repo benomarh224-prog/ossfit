@@ -4,10 +4,11 @@ import { db } from "@/lib/db";
 import { getSiteContent, parseJSON } from "@/lib/server-utils";
 import { LandingPage } from "@/components/marketing/landing-page";
 import { ClientApp } from "@/components/dashboard/client-app";
-import { AdminApp } from "@/components/admin/admin-app";
+import { redirect } from "next/navigation";
 import { publicSiteContent } from "@/lib/site-content";
 import type { Metadata } from "next";
 import { siteOrigin } from "@/lib/site-url";
+import { signedInDestination } from "@/lib/login-access";
 
 export const dynamic = "force-dynamic";
 
@@ -56,12 +57,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<{ v
   const { view } = await searchParams;
 
   // Authenticated coach → admin dashboard
-  if (session?.user?.role === "COACH" && view !== "site") {
-    return <AdminApp />;
+  if (signedInDestination(session?.user) === "/admin" && view !== "site") {
+    redirect("/admin");
   }
 
   // Authenticated client → client dashboard (handles onboarding gate client-side)
-  if (session?.user?.role === "CLIENT") {
+  if (signedInDestination(session?.user) === "/" && view !== "site") {
     return <ClientApp />;
   }
 

@@ -18,7 +18,7 @@ npm run dev
 ## Owner handoff
 
 1. Open the private owner setup link supplied separately. Choose the coach email and a password of at least 12 characters. The link closes permanently after the first coach account is created.
-2. Sign in from the website to open the coach dashboard. `View site` opens the public page in another tab.
+2. Open `/admin` and sign in with the coach account to open administration. This page also lets you switch from an active subscriber session. Ordinary public registration creates subscriber accounts and never grants coach access. A successful sign-in fully reloads the destination to discard the previous account's router and query caches. `View site` opens the public page in another tab.
    In **Account settings**, change the sign-in email and/or password by confirming the current password. All sessions are revoked after saving; sign in again with the updated credentials. Email recovery for a forgotten password is not implemented.
 3. Review the coach name, professional contact details, images and copy in Site Content. The surname and exact city were not supplied. The current training imagery is illustrative, not a verified portrait of the coach.
 4. Confirm the package scope and prices: 399 / 699 / 1199 MAD per month. The coach can edit, hide or add packages.

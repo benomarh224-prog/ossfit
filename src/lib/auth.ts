@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import { db } from "@/lib/db";
 import { allowRequest, requestIp } from "@/lib/rate-limit";
 import { isSessionCurrent } from "@/lib/account-security";
+import { loginPortalAllowsRole } from "@/lib/login-access";
 
 export const authOptions: NextAuthOptions = {
   session: { strategy: "jwt", maxAge: 30 * 24 * 60 * 60 },
@@ -16,6 +17,7 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
+        portal: { label: "Portal", type: "hidden" },
       },
       async authorize(credentials, req) {
         if (!credentials?.email || !credentials?.password) return null;
@@ -30,6 +32,7 @@ export const authOptions: NextAuthOptions = {
         if (!user || !user.password) return null;
         const ok = await bcrypt.compare(credentials.password, user.password);
         if (!ok) return null;
+        if (!loginPortalAllowsRole(user.role, credentials.portal)) return null;
         return {
           id: user.id,
           email: user.email,

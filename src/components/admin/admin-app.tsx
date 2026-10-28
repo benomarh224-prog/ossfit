@@ -158,7 +158,7 @@ function SidebarFooter() {
         variant="ghost"
         size="sm"
         className="justify-start gap-2 text-muted-foreground hover:text-destructive"
-        onClick={() => signOut({ callbackUrl: "/" })}
+        onClick={() => signOut({ callbackUrl: "/admin" })}
       >
         <LogOut className="size-4" />
         {t("nav.logout")}

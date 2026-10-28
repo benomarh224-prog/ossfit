@@ -13,7 +13,7 @@ export default async function SetupPage() {
   return <main className="mx-auto flex min-h-screen max-w-lg flex-col justify-center gap-5 px-6">
     <div className="flex justify-end"><ThemeSwitcher /></div>
     <h1 className="font-display text-3xl uppercase">Your coach account is ready.</h1>
-    <p className="text-muted-foreground">Owner setup is closed. Sign in from the website to open your coach dashboard.</p>
-    <Link href="/" className="font-semibold text-primary">Go to website →</Link>
+    <p className="text-muted-foreground">Owner setup is closed. Sign in with your coach account to open administration.</p>
+    <Link href="/admin" className="font-semibold text-primary">Go to administration →</Link>
   </main>;
 }
