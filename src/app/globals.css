@@ -163,6 +163,32 @@
 }
 
 @layer components {
+  /* The photograph stays dark in both themes so overlaid copy has steady contrast. */
+  .hero-campaign {
+    --primary: oklch(0.82 0.21 132);
+    --primary-foreground: oklch(0.15 0.02 132);
+    --ring: oklch(0.82 0.21 132);
+    background-color: #0b110d;
+    color: white;
+  }
+  .hero-campaign-scrim {
+    background:
+      linear-gradient(90deg, rgb(5 12 8 / 0.86), rgb(5 12 8 / 0.46) 70%, rgb(5 12 8 / 0.2)),
+      linear-gradient(0deg, rgb(5 12 8 / 0.88), transparent 75%);
+  }
+  [dir="rtl"] .hero-campaign-scrim {
+    background:
+      linear-gradient(270deg, rgb(5 12 8 / 0.86), rgb(5 12 8 / 0.46) 70%, rgb(5 12 8 / 0.2)),
+      linear-gradient(0deg, rgb(5 12 8 / 0.88), transparent 75%);
+  }
+  @media (min-width: 1024px) {
+    .hero-campaign-scrim {
+      background: linear-gradient(90deg, rgb(5 12 8 / 0.94), rgb(5 12 8 / 0.8) 38%, rgb(5 12 8 / 0.12) 78%);
+    }
+    [dir="rtl"] .hero-campaign-scrim {
+      background: linear-gradient(270deg, rgb(5 12 8 / 0.94), rgb(5 12 8 / 0.8) 38%, rgb(5 12 8 / 0.12) 78%);
+    }
+  }
   .surface-card {
     min-width: 0;
     border: 1px solid color-mix(in oklch, var(--border) 75%, transparent);

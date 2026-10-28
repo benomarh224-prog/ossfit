@@ -9,7 +9,7 @@ This is a fictional illustrative athlete, not a portrait or endorsement of the r
 - `public/images/hero-strength-v2.webp`: 1536 × 1024, 105,952 bytes.
 - `public/images/hero-strength-v2-mobile.webp`: 800 × 533, 38,878 bytes.
 
-The generated PNG was inspected and encoded into these responsive WebP files with the existing Sharp dependency. There are no logos or baked-in captions; text remains accessible HTML. The hero uses a high-priority image with explicit dimensions, responsive sources and CSS cropping at the desktop breakpoint. The campaign is shown first on mobile. Browser layout verification on a real phone remains outstanding because browser automation is disabled in this workspace.
+The generated PNG was inspected and encoded into these responsive WebP files with the existing Sharp dependency. There are no logos or baked-in captions; text remains accessible HTML. The hero combines the photograph, title, copy and actions in a single banner at every breakpoint. The high-priority image fills the banner behind the content, with a directional dark overlay and a local lime accent that retain text contrast in both themes. Arabic mirrors the photograph and overlay direction. The responsive source size accounts for the height of the portrait-shaped mobile banner so high-density phones receive the sharper image. Buttons share a row on mobile, and the content can grow for longer translations or larger text. Browser layout verification on a real phone remains outstanding because browser automation is disabled in this workspace.
 
 The original stock path `/images/hero.jpg` resolves to the new campaign for display and link previews. Uploaded custom hero images are preserved. The coach's portrait remains a separate About section setting.
 
