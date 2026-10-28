@@ -16,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { SectionShell, SectionLoading, ErrorState, ImageUpload } from "../ui-bits";
 import { apiFetch, type AdminSiteContent } from "../lib";
+import { heroImageSource } from "@/lib/hero-media";
 
 const schema = z.object({
   brandName: z.string().min(1),
@@ -214,8 +215,8 @@ export default function ContentSection() {
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <ImageUpload
-                label="Hero background image"
-                value={watch("heroImage") || undefined}
+                label="Hero campaign image"
+                value={heroImageSource(watch("heroImage"))}
                 onChange={(url) => setValue("heroImage", url, { shouldDirty: true })}
               />
               <ImageUpload

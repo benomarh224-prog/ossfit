@@ -4,6 +4,7 @@ import { LandingPage } from "@/components/marketing/landing-page";
 import { publicSiteContent } from "@/lib/site-content";
 import type { Metadata } from "next";
 import { siteOrigin } from "@/lib/site-url";
+import { heroImageSource } from "@/lib/hero-media";
 
 export const dynamic = "force-dynamic";
 
@@ -11,8 +12,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const content = await getSiteContent();
   const title = `${content.brandName} — Personal Training & Online Coaching`;
   return { title: { absolute: title }, description: content.heroSubtitle,
-    openGraph: { title, description: content.heroSubtitle, url: siteOrigin(), siteName: content.brandName, images: [{ url: content.heroImage || "/images/hero.jpg" }] },
-    twitter: { title, description: content.heroSubtitle, images: [content.heroImage || "/images/hero.jpg"] },
+    openGraph: { title, description: content.heroSubtitle, url: siteOrigin(), siteName: content.brandName, images: [{ url: heroImageSource(content.heroImage), alt: "Strength training — illustrative campaign image" }] },
+    twitter: { title, description: content.heroSubtitle, images: [heroImageSource(content.heroImage)] },
   };
 }
 

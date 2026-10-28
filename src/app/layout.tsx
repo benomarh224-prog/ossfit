@@ -5,6 +5,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "@/components/ui/sonner";
 import { Providers } from "@/components/providers";
 import { siteOrigin } from "@/lib/site-url";
+import { HERO_CAMPAIGN_IMAGE } from "@/lib/hero-media";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -54,14 +55,14 @@ export const metadata: Metadata = {
     siteName: "Coach Oussama",
     type: "website",
     locale: "en_US",
-    images: [{ url: "/images/hero.jpg", alt: "Coach Oussama — personal training" }],
+    images: [{ url: HERO_CAMPAIGN_IMAGE, alt: "Strength training — illustrative campaign image" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Coach Oussama — Online Personal Trainer in Morocco",
     description:
       "Personal training and online coaching with Coach Oussama.",
-    images: ["/images/hero.jpg"],
+    images: [HERO_CAMPAIGN_IMAGE],
   },
   alternates: {
     canonical: "/",
