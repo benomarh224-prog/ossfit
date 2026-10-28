@@ -20,7 +20,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { KpiCard, SectionLoading, ErrorState, SectionShell } from "../ui-bits";
 import { apiFetch, type AdminAnalytics } from "../lib";
 
-const PIE_COLORS = ["oklch(0.82 0.21 132)", "oklch(0.72 0.19 60)", "oklch(0.62 0.13 200)", "oklch(0.78 0.16 330)", "oklch(0.7 0.15 280)"];
+const PIE_COLORS = ["var(--chart-1)", "var(--chart-2)", "var(--chart-3)", "var(--chart-4)", "var(--chart-5)"];
 
 function ChartTooltip({ active, payload, label }: any) {
   if (!active || !payload?.length) return null;
@@ -114,23 +114,23 @@ export default function OverviewSection() {
                 <AreaChart data={data.monthlyTrend} margin={{ top: 8, right: 8, bottom: 8, left: 8 }}>
                   <defs>
                     <linearGradient id="revGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="oklch(0.82 0.21 132)" stopOpacity={0.5} />
-                      <stop offset="95%" stopColor="oklch(0.82 0.21 132)" stopOpacity={0} />
+                      <stop offset="5%" stopColor="var(--chart-1)" stopOpacity={0.5} />
+                      <stop offset="95%" stopColor="var(--chart-1)" stopOpacity={0} />
                     </linearGradient>
                     <linearGradient id="appGrad" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="oklch(0.72 0.19 60)" stopOpacity={0.5} />
-                      <stop offset="95%" stopColor="oklch(0.72 0.19 60)" stopOpacity={0} />
+                      <stop offset="5%" stopColor="var(--chart-2)" stopOpacity={0.5} />
+                      <stop offset="95%" stopColor="var(--chart-2)" stopOpacity={0} />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" stroke="oklch(1 0 0 / 0.06)" />
-                  <XAxis dataKey="name" stroke="oklch(0.68 0.01 264)" tickLine={false} axisLine={false} fontSize={12} />
-                  <YAxis stroke="oklch(0.68 0.01 264)" tickLine={false} axisLine={false} fontSize={12} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" />
+                  <XAxis dataKey="name" stroke="var(--muted-foreground)" tickLine={false} axisLine={false} fontSize={12} />
+                  <YAxis stroke="var(--muted-foreground)" tickLine={false} axisLine={false} fontSize={12} />
                   <Tooltip content={<ChartTooltip />} />
                   <Area
                     type="monotone"
                     dataKey="revenue"
                     name={t("admin.monthlyRevenue")}
-                    stroke="oklch(0.82 0.21 132)"
+                    stroke="var(--chart-1)"
                     strokeWidth={2}
                     fill="url(#revGrad)"
                   />
@@ -138,7 +138,7 @@ export default function OverviewSection() {
                     type="monotone"
                     dataKey="applications"
                     name={t("admin.newApplications")}
-                    stroke="oklch(0.72 0.19 60)"
+                    stroke="var(--chart-2)"
                     strokeWidth={2}
                     fill="url(#appGrad)"
                   />
@@ -164,7 +164,7 @@ export default function OverviewSection() {
                     innerRadius={55}
                     outerRadius={85}
                     paddingAngle={3}
-                    stroke="oklch(0.13 0.005 264)"
+                    stroke="var(--card)"
                   >
                     {data.packageDistribution.map((_, i) => (
                       <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />

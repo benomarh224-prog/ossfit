@@ -21,6 +21,7 @@ import {
   Overview, Workouts, Nutrition, ProgressSection, Messages, Subscription, Consultations, Profile,
 } from "./sections";
 import { LanguageSwitcher } from "@/components/site/language-switcher";
+import { ThemeSwitcher } from "@/components/site/theme-switcher";
 
 type Section = "overview" | "workouts" | "nutrition" | "progress" | "messages" | "subscription" | "consultations" | "profile";
 
@@ -97,16 +98,17 @@ export function ClientApp() {
       {/* Top bar */}
       <header className="sticky top-0 z-30 border-b border-border/50 bg-background/80 backdrop-blur-xl">
         <div className="flex h-16 items-center justify-between px-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+          <div className="flex min-w-0 items-center gap-3">
+            <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Logo className="h-5 w-5" />
             </span>
-            <div>
-              <p className="font-display text-lg font-bold uppercase leading-none">{content?.brandName || "Coach Oussama"}</p>
+            <div className="min-w-0">
+              <p className="truncate font-display text-sm font-bold uppercase leading-none sm:text-lg">{content?.brandName || "Coach Oussama"}</p>
               <Badge variant="outline" className="mt-0.5 text-[10px] uppercase text-primary">{t("nav.dashboard")}</Badge>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex shrink-0 items-center gap-2">
+            <ThemeSwitcher />
             <LanguageSwitcher compact />
             <Avatar className="h-8 w-8 border border-border">
               <AvatarFallback className="bg-primary/15 text-xs text-primary">{initials}</AvatarFallback>

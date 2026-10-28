@@ -134,7 +134,7 @@ export default function TransformationsSection() {
                   <p className="line-clamp-3 text-sm text-muted-foreground">{item.story}</p>
                 )}
                 {!item.consent && (
-                  <span className="flex items-center gap-1 text-[10px] text-amber-300">
+                  <span className="flex items-center gap-1 text-[10px] text-amber-800 dark:text-amber-300">
                     <AlertTriangle className="size-3" />
                     No consent recorded
                   </span>
@@ -357,7 +357,7 @@ function TransformationEditDialog({
         </div>
 
         {consentWarning && (
-          <div className="flex items-center gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
+          <div className="flex items-center gap-2 rounded-lg border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-800 dark:text-amber-300">
             <AlertTriangle className="size-4" />
             Publishing without recorded consent — please confirm.
           </div>

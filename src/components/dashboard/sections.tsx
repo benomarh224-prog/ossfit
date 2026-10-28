@@ -98,8 +98,8 @@ export function Overview({ me, whatsapp }: { me: any; whatsapp?: string }) {
               <div className="space-y-3">
                 <div className="grid grid-cols-3 gap-3 text-center">
                   <Macro label={t("dashboard.protein")} value={`${nutrition.proteinG}g`} color="text-primary" />
-                  <Macro label={t("dashboard.carbs")} value={`${nutrition.carbsG}g`} color="text-amber-500" />
-                  <Macro label={t("dashboard.fats")} value={`${nutrition.fatsG}g`} color="text-blue-400" />
+                  <Macro label={t("dashboard.carbs")} value={`${nutrition.carbsG}g`} color="text-amber-800 dark:text-amber-400" />
+                  <Macro label={t("dashboard.fats")} value={`${nutrition.fatsG}g`} color="text-blue-700 dark:text-blue-400" />
                 </div>
                 {nutrition.meals?.length > 0 && (
                   <div className="space-y-1.5">

@@ -8,6 +8,7 @@ import { ShieldCheck, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { ThemeSwitcher } from "@/components/site/theme-switcher";
 
 export function CoachSetup() {
   const router = useRouter();
@@ -37,7 +38,7 @@ export function CoachSetup() {
 
   return <main className="flex min-h-screen items-center justify-center bg-grid px-4 py-12">
     <div className="w-full max-w-md rounded-2xl border border-border bg-card p-7 shadow-2xl">
-      <ShieldCheck className="mb-5 h-10 w-10 text-primary" />
+      <div className="mb-5 flex items-center justify-between"><ShieldCheck className="h-10 w-10 text-primary" /><ThemeSwitcher /></div>
       <p className="text-xs font-semibold uppercase tracking-[.22em] text-primary">Coach Oussama · Owner setup</p>
       <h1 className="mt-3 font-display text-3xl uppercase">Your coaching space starts here.</h1>
       <p className="mt-3 text-sm text-muted-foreground">أنشئ حساب المدرب بإيميلك وكلمة مرور خاصة بك. رابط الإعداد يُستخدم مرة واحدة فقط.</p>

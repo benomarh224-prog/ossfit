@@ -297,11 +297,11 @@ export function statusColor(status: string): string {
       return "bg-primary/15 text-primary border-primary/30";
     case "PENDING":
     case "REQUESTED":
-      return "bg-amber-500/15 text-amber-300 border-amber-500/30";
+      return "bg-amber-500/15 text-amber-800 dark:text-amber-300 border-amber-500/30";
     case "REJECTED":
     case "CANCELLED":
     case "EXPIRED":
-      return "bg-destructive/15 text-red-300 border-destructive/30";
+      return "bg-destructive/15 text-red-700 dark:text-red-300 border-destructive/30";
     case "PAUSED":
       return "bg-secondary text-secondary-foreground border-border";
     default:

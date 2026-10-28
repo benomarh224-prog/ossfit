@@ -8,6 +8,7 @@ import { useI18n } from "@/lib/i18n/i18n-provider";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger, SheetClose } from "@/components/ui/sheet";
 import { LanguageSwitcher } from "./language-switcher";
+import { ThemeSwitcher } from "./theme-switcher";
 import { AuthModal } from "@/components/auth/auth-modal";
 import { cn } from "@/lib/utils";
 
@@ -72,18 +73,18 @@ export function SiteHeader({ brandName, showResults = false, showTestimonials = 
       )}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6 lg:px-8">
-        <Link href="#top" className="flex shrink-0 items-center gap-2" aria-label={brandName || "Coach Oussama"}>
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+        <Link href="#top" className="flex min-w-0 items-center gap-2" aria-label={brandName || "Coach Oussama"}>
+          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Dumbbell className="h-5 w-5" />
           </span>
-          <span className="font-display text-base font-bold uppercase tracking-tight sm:text-lg">
+          <span className="truncate font-display text-sm font-bold uppercase tracking-tight sm:text-lg">
             {brandName || "Coach Oussama"}
           </span>
         </Link>
 
         <nav
           aria-label="Primary"
-          className="hidden items-center gap-0.5 lg:flex"
+          className="hidden items-center gap-0.5 xl:flex"
         >
           {navigation.map((n) => {
             const isActive = active === n.href;
@@ -104,7 +105,8 @@ export function SiteHeader({ brandName, showResults = false, showTestimonials = 
           })}
         </nav>
 
-        <div className="flex items-center gap-1.5">
+        <div className="flex shrink-0 items-center gap-1.5">
+          <ThemeSwitcher />
           <LanguageSwitcher compact />
           <Button
             variant="ghost"
@@ -118,13 +120,13 @@ export function SiteHeader({ brandName, showResults = false, showTestimonials = 
           <Button
             size="sm"
             onClick={() => openAuth("register")}
-            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            className="hidden bg-primary text-primary-foreground hover:bg-primary/90 sm:inline-flex"
           >
             <UserPlus className="mr-1.5 h-4 w-4" />
             <span className="hidden sm:inline">{t("nav.register")}</span>
           </Button>
 
-          <div className="lg:hidden">
+          <div className="xl:hidden">
             <Sheet>
               <SheetTrigger asChild>
                 <Button variant="ghost" size="icon" aria-label="Menu">

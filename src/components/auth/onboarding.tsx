@@ -1,5 +1,8 @@
 "use client";
 
+import { ThemeSwitcher } from "@/components/site/theme-switcher";
+import { LanguageSwitcher } from "@/components/site/language-switcher";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -157,6 +160,7 @@ export function Onboarding({ packages }: { packages: any[] }) {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-background px-4 py-10">
       <div className="w-full max-w-2xl">
+        <div className="mb-4 flex justify-end gap-1"><ThemeSwitcher /><LanguageSwitcher compact /></div>
         <div className="mb-6 text-center">
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
             <Dumbbell className="h-6 w-6" />

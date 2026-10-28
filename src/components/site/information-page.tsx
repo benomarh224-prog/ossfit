@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowLeft, ShieldCheck, MessageCircle } from "lucide-react";
 import { useI18n } from "@/lib/i18n/i18n-provider";
 import { LanguageSwitcher } from "./language-switcher";
+import { ThemeSwitcher } from "./theme-switcher";
 import { buildWhatsappLink } from "@/lib/client-utils";
 import { Button } from "@/components/ui/button";
 
@@ -68,7 +69,7 @@ export function InformationPage({ kind, brandName, whatsapp }: { kind: "privacy"
   return <main className="min-h-screen bg-grid">
     <div className="mx-auto max-w-4xl px-5 py-6 sm:px-8">
       <div className="flex items-center justify-between gap-4 border-b border-border pb-5">
-        <Link href="/" className="font-display text-lg uppercase tracking-wide">{brandName}</Link><LanguageSwitcher />
+        <Link href="/" className="min-w-0 font-display text-lg uppercase tracking-wide">{brandName}</Link><div className="flex shrink-0 items-center gap-1"><ThemeSwitcher /><LanguageSwitcher compact /></div>
       </div>
       <Link href="/" className="mt-8 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary"><ArrowLeft className="h-4 w-4 rtl:rotate-180" />{copy.back}</Link>
       <ShieldCheck className="mt-12 h-10 w-10 text-primary" />

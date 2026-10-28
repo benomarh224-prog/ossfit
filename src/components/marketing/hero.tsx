@@ -52,7 +52,7 @@ export function Hero({ content }: { content: Content }) {
     : null;
 
   return (
-    <section id="top" className="relative flex min-h-[100svh] items-center overflow-hidden pt-16">
+    <section id="top" className="relative isolate flex min-h-[100svh] items-center overflow-hidden pt-16">
       {/* Background image with overlay */}
       <div className="absolute inset-0 -z-10">
         {content.heroImage ? (
@@ -63,7 +63,7 @@ export function Hero({ content }: { content: Content }) {
             className="h-full w-full object-cover object-center"
           />
         ) : null}
-        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/60 dark:via-background/85 dark:to-background/30" />
         <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-background/40" />
         <div className="absolute inset-0 bg-radial-lime opacity-70" />
       </div>

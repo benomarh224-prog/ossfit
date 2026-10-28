@@ -14,15 +14,15 @@ import { ReactNode } from "react";
 export const STATUS_COLORS: Record<string, string> = {
   ACTIVE: "bg-primary/15 text-primary border-primary/30",
   APPROVED: "bg-primary/15 text-primary border-primary/30",
-  PENDING: "bg-amber-500/15 text-amber-500 border-amber-500/30",
-  REQUESTED: "bg-amber-500/15 text-amber-500 border-amber-500/30",
+  PENDING: "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30",
+  REQUESTED: "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30",
   EXPIRED: "bg-muted text-muted-foreground border-border",
   CANCELLED: "bg-muted text-muted-foreground border-border",
   REJECTED: "bg-destructive/15 text-destructive border-destructive/30",
   VERIFIED: "bg-primary/15 text-primary border-primary/30",
-  SUBMITTED: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+  SUBMITTED: "bg-blue-500/15 text-blue-700 dark:text-blue-400 border-blue-500/30",
   COMPLETED: "bg-primary/15 text-primary border-primary/30",
-  PAUSED: "bg-amber-500/15 text-amber-500 border-amber-500/30",
+  PAUSED: "bg-amber-500/15 text-amber-800 dark:text-amber-400 border-amber-500/30",
 };
 
 export function StatusBadge({ status }: { status: string }) {

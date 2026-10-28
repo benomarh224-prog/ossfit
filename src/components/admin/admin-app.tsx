@@ -29,6 +29,8 @@ import { Sheet, SheetContent, SheetTitle, SheetDescription } from "@/components/
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion, AnimatePresence } from "framer-motion";
 import type { AdminSection } from "./lib";
+import { ThemeSwitcher } from "@/components/site/theme-switcher";
+import { LanguageSwitcher } from "@/components/site/language-switcher";
 
 import OverviewSection from "./sections/overview";
 import ClientsSection from "./sections/clients";
@@ -236,6 +238,8 @@ export function AdminApp() {
                 {activeItem?.label ?? t("admin.overview")}
               </h1>
             </div>
+            <ThemeSwitcher />
+            <LanguageSwitcher compact />
             <div className="hidden items-center gap-2 sm:flex">
               <Button asChild variant="outline" size="sm">
                 <a href="/?view=site" target="_blank" rel="noopener noreferrer">

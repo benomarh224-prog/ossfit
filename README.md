@@ -29,6 +29,8 @@ npm run dev
 
 ## Access and uploads
 
+The appearance menu in the website and dashboards offers Light, Dark and Use device setting. The choice persists in the browser. The original dark appearance remains the default until a visitor selects another option.
+
 Client uploads are private to their owner and the coach. Coach uploads are intended for public marketing content. Images are decoded, stripped of metadata, resized and converted to WebP. The input limit is 3 MB and 30 uploads per account per rolling day. Uploaded images persist in a private Vercel Blob store, with access enforced through the application.
 
 Bank account fields are omitted from anonymous page data. Registration and sign-in are rate limited through PostgreSQL. Prices and payment ownership are checked on the server.
